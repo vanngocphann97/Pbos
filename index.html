@@ -1,117 +1,26 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>PBOS v3.1 | Phan Van Ngoc</title>
-  <link rel="stylesheet" href="assets/css/style.css"/>
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>PBOS v3.2</title><link rel="stylesheet" href="assets/css/style.css"/></head>
 <body>
 <div class="app">
   <aside class="rail">
-    <div class="brand">
-      <div class="logo">PB</div>
-      <div><h1>PBOS</h1><p id="versionText">Workflow Engine</p></div>
-    </div>
-    <nav>
-      <a href="#today" class="active">Today</a>
-      <a href="#workflow">Workflow</a>
-      <a href="#inbox">Inbox</a>
-      <a href="#projects">Projects</a>
-      <a href="#career">Career</a>
-      <a href="#knowledge">Knowledge</a>
-      <a href="#portfolio">Portfolio</a>
-      <a href="#review">Review</a>
-      <a href="admin.html">Admin</a>
-    </nav>
-    <div class="rule">
-      <span>Operating Law</span>
-      <strong>Input → Decision → Output → Asset</strong>
-    </div>
+    <div class="brand"><div class="logo">PB</div><div><h1>PBOS</h1><p id="versionText">OS + Studio</p></div></div>
+    <nav><a href="#today" class="active">Today</a><a href="#workflow">Workflow</a><a href="#inbox">Inbox</a><a href="#projects">Projects</a><a href="#career">Career</a><a href="#knowledge">Knowledge</a><a href="#portfolio">Portfolio</a><a href="#review">Review</a><a href="studio.html">Studio</a><a href="admin.html">JSON</a></nav>
+    <div class="rule"><span>Operating Law</span><strong>Input → Decision → Output → Asset</strong></div>
   </aside>
-
   <main>
     <section id="today" class="daily">
-      <div class="daily-left">
-        <div class="eyebrow">Daily Command</div>
-        <h2 id="greeting">Good Morning, Ngoc</h2>
-        <p id="dateNow" class="muted"></p>
-        <div class="north">
-          <span>North Star</span>
-          <strong id="northStar"></strong>
-          <p id="principle"></p>
-        </div>
-      </div>
-
-      <div class="daily-right">
-        <div class="score-card primary"><span>Operating Score</span><strong id="operatingScore">--</strong></div>
-        <div class="score-card"><span>This Week</span><strong id="weekOutput">--</strong></div>
-        <div class="score-card wide"><span>Today's Output</span><strong id="todayOutput">--</strong><p id="deadline"></p></div>
-      </div>
+      <div class="daily-left"><div class="eyebrow">Daily Command</div><h2 id="greeting">Good Morning, Ngoc</h2><p id="dateNow" class="muted"></p><div class="north"><span>North Star</span><strong id="northStar"></strong><p id="principle"></p></div></div>
+      <div class="daily-right"><div class="score-card primary"><span>Operating Score</span><strong id="operatingScore">--</strong></div><div class="score-card"><span>This Week</span><strong id="weekOutput">--</strong></div><div class="score-card wide"><span>Today's Output</span><strong id="todayOutput">--</strong><p id="deadline"></p></div></div>
     </section>
-
-    <section class="board">
-      <div class="panel">
-        <div class="section-title"><h3>Focus</h3><p>3 việc đủ để thắng ngày hôm nay</p></div>
-        <div id="focusGrid" class="focus-grid"></div>
-      </div>
-      <div class="panel">
-        <div class="section-title"><h3>Next</h3><p>hành động tiếp theo</p></div>
-        <div id="nextList" class="list"></div>
-      </div>
-    </section>
-
-    <section id="workflow" class="panel">
-      <div class="section-title"><h3>Workflow Engine</h3><p>xương sống vận hành PBOS</p></div>
-      <div id="workflowGrid" class="workflow-grid"></div>
-    </section>
-
-    <section id="inbox" class="board">
-      <div class="panel">
-        <div class="section-title"><h3>Inbox</h3><p>mọi thứ vào đây trước</p></div>
-        <div id="inboxList" class="list"></div>
-      </div>
-      <div class="panel">
-        <div class="section-title"><h3>Decision Routes</h3><p>phân loại rõ trước khi làm</p></div>
-        <div id="routeList" class="route-grid"></div>
-      </div>
-    </section>
-
-    <section id="projects" class="panel">
-      <div class="section-title"><h3>Projects</h3><p>tiến độ · rủi ro · hành động kế tiếp</p></div>
-      <div id="projectGrid" class="project-grid"></div>
-    </section>
-
-    <section id="career" class="panel">
-      <div class="section-title"><h3>Career Capital</h3><p id="careerRole"></p></div>
-      <div id="careerGrid" class="metric-grid"></div>
-      <table><thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead><tbody id="achievementRows"></tbody></table>
-    </section>
-
-    <section id="knowledge" class="panel">
-      <div class="section-title"><h3>Knowledge</h3><p>học theo vai trò mục tiêu</p></div>
-      <div id="knowledgeGrid" class="project-grid"></div>
-    </section>
-
-    <section id="portfolio" class="panel">
-      <div class="section-title"><h3>Portfolio</h3><p>output chuyển thành tài sản</p></div>
-      <div id="portfolioGrid" class="asset-grid"></div>
-    </section>
-
-    <section id="review" class="board">
-      <div class="panel">
-        <div class="section-title"><h3>Weekly Review</h3><p>4 câu hỏi bắt buộc</p></div>
-        <div id="questionList" class="list"></div>
-      </div>
-      <div class="panel">
-        <div class="section-title"><h3>Rules</h3><p>luật không thương lượng</p></div>
-        <div id="ruleList" class="list"></div>
-      </div>
-    </section>
-
-    <footer>PBOS v3.1 · Workflow Engine · Phan Van Ngoc</footer>
+    <section class="board"><div class="panel"><div class="section-title"><h3>Focus</h3><p>3 việc đủ để thắng ngày hôm nay</p></div><div id="focusGrid" class="focus-grid"></div></div><div class="panel"><div class="section-title"><h3>Next</h3><p>hành động tiếp theo</p></div><div id="nextList" class="list"></div></div></section>
+    <section id="workflow" class="panel"><div class="section-title"><h3>Workflow Engine</h3><p>xương sống vận hành PBOS</p></div><div id="workflowGrid" class="workflow-grid"></div></section>
+    <section id="inbox" class="board"><div class="panel"><div class="section-title"><h3>Inbox</h3><p>mọi thứ vào đây trước</p></div><div id="inboxList" class="list"></div></div><div class="panel"><div class="section-title"><h3>Decision Routes</h3><p>phân loại rõ trước khi làm</p></div><div id="routeList" class="route-grid"></div></div></section>
+    <section id="projects" class="panel"><div class="section-title"><h3>Projects</h3><p>tiến độ · rủi ro · hành động kế tiếp</p></div><div id="projectGrid" class="project-grid"></div></section>
+    <section id="career" class="panel"><div class="section-title"><h3>Career Capital</h3><p id="careerRole"></p></div><div id="careerGrid" class="metric-grid"></div><table><thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead><tbody id="achievementRows"></tbody></table></section>
+    <section id="knowledge" class="panel"><div class="section-title"><h3>Knowledge</h3><p>học theo vai trò mục tiêu</p></div><div id="knowledgeGrid" class="project-grid"></div></section>
+    <section id="portfolio" class="panel"><div class="section-title"><h3>Portfolio</h3><p>output chuyển thành tài sản</p></div><div id="portfolioGrid" class="asset-grid"></div></section>
+    <section id="review" class="board"><div class="panel"><div class="section-title"><h3>Weekly Review</h3><p>4 câu hỏi bắt buộc</p></div><div id="questionList" class="list"></div></div><div class="panel"><div class="section-title"><h3>Rules</h3><p>luật không thương lượng</p></div><div id="ruleList" class="list"></div></div></section>
+    <footer>PBOS v3.2 · OS + Studio · Phan Van Ngoc</footer>
   </main>
-</div>
-<script src="assets/js/app.js"></script>
-</body>
-</html>
+</div><script src="assets/js/app.js"></script></body></html>

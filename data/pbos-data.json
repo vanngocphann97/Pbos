@@ -1,9 +1,9 @@
 {
   "meta": {
-    "version": "3.1",
+    "version": "3.2",
     "owner": "Phan Van Ngoc",
     "title": "PBOS",
-    "subtitle": "Workflow Engine",
+    "subtitle": "OS + Studio",
     "northStar": "Build systems. Create value. Inspire people.",
     "principle": "Every input must become a decision. Every output must become an asset.",
     "mode": "Public"
@@ -28,8 +28,8 @@
         "status": "Doing"
       },
       {
-        "title": "PBOS Workflow",
-        "why": "Ổn định cách vận hành",
+        "title": "PBOS Studio",
+        "why": "Tạo luồng nhập liệu",
         "status": "Build"
       }
     ],
@@ -130,9 +130,9 @@
   "projects": [
     {
       "name": "PBOS",
-      "progress": 82,
+      "progress": 84,
       "risk": "Low",
-      "next": "Deploy Workflow Engine",
+      "next": "Deploy Studio v3.2",
       "status": "Active"
     },
     {
@@ -283,7 +283,7 @@
     {
       "name": "PBOS",
       "type": "Product",
-      "status": "v3.1"
+      "status": "v3.2"
     }
   ],
   "review": {

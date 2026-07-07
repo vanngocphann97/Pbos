@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>PBOS Studio v3.2</title><link rel="stylesheet" href="assets/css/style.css"/></head>
+<body>
+<main class="studio">
+  <section class="panel studio-head">
+    <div><div class="eyebrow">PBOS Studio</div><h2>Input → Decision → Output</h2><p class="muted">Nhập dữ liệu bằng form, lưu tạm trong trình duyệt, export <code>pbos-data.json</code> để upload lên GitHub.</p></div>
+    <div class="actions"><a class="btn secondary" href="index.html">View OS</a><button id="loadData" class="btn">Load</button><button id="saveLocal" class="btn secondary">Save Local</button><button id="exportData" class="btn">Export JSON</button></div>
+  </section>
+
+  <section class="tabs panel">
+    <button data-tab="today" class="tab active">Today</button>
+    <button data-tab="inbox" class="tab">Inbox</button>
+    <button data-tab="project" class="tab">Project</button>
+    <button data-tab="knowledge" class="tab">Knowledge</button>
+    <button data-tab="portfolio" class="tab">Portfolio</button>
+    <button data-tab="review" class="tab">Review</button>
+  </section>
+
+  <section id="tab-today" class="panel tab-panel active">
+    <div class="section-title"><h3>Today Editor</h3><p>chỉ 3 focus</p></div>
+    <div class="form-grid">
+      <label>Operating Score<input id="operatingScore" type="number" min="0" max="100"></label>
+      <label>Week Done<input id="weekDone" type="number" min="0"></label>
+      <label>Week Target<input id="weekTarget" type="number" min="0"></label>
+      <label>Today Output<input id="todayOutput" type="text"></label>
+      <label>Deadline<input id="deadline" type="text"></label>
+    </div>
+    <div class="form-grid three">
+      <label>Focus 1<input id="focus1" type="text"></label>
+      <label>Focus 2<input id="focus2" type="text"></label>
+      <label>Focus 3<input id="focus3" type="text"></label>
+    </div>
+    <button id="applyToday" class="btn">Apply Today</button>
+  </section>
+
+  <section id="tab-inbox" class="panel tab-panel">
+    <div class="section-title"><h3>Inbox Capture</h3><p>mọi thứ vào đây trước</p></div>
+    <div class="form-grid">
+      <label>Item<input id="inboxItem" type="text"></label>
+      <label>Type<select id="inboxType"><option>Project</option><option>Learning</option><option>Content</option><option>Portfolio</option><option>Archive</option></select></label>
+      <label>Route<select id="inboxRoute"><option>Project</option><option>Learning</option><option>Content</option><option>Portfolio</option><option>Archive</option></select></label>
+      <label>Status<select id="inboxStatus"><option>Open</option><option>Doing</option><option>Done</option><option>Archive</option></select></label>
+    </div>
+    <button id="addInbox" class="btn">Add Inbox</button>
+    <div id="inboxPreview" class="preview"></div>
+  </section>
+
+  <section id="tab-project" class="panel tab-panel">
+    <div class="section-title"><h3>Project Manager</h3><p>dự án có progress và next action</p></div>
+    <div class="form-grid">
+      <label>Name<input id="projectName" type="text"></label>
+      <label>Progress<input id="projectProgress" type="number" min="0" max="100"></label>
+      <label>Risk<select id="projectRisk"><option>Low</option><option>Medium</option><option>High</option></select></label>
+      <label>Status<select id="projectStatus"><option>Active</option><option>Risk</option><option>Hold</option><option>Done</option></select></label>
+      <label class="wide">Next Action<input id="projectNext" type="text"></label>
+    </div>
+    <button id="addProject" class="btn">Add Project</button>
+    <div id="projectPreview" class="preview"></div>
+  </section>
+
+  <section id="tab-knowledge" class="panel tab-panel">
+    <div class="section-title"><h3>Knowledge Manager</h3><p>học theo vai trò mục tiêu</p></div>
+    <div class="form-grid">
+      <label>Name<input id="knowledgeName" type="text"></label>
+      <label>Type<input id="knowledgeType" type="text"></label>
+      <label>Progress<input id="knowledgeProgress" type="number" min="0" max="100"></label>
+      <label>Priority<select id="knowledgePriority"><option>P1</option><option>P2</option><option>P3</option><option>P4</option></select></label>
+    </div>
+    <button id="addKnowledge" class="btn">Add Knowledge</button>
+    <div id="knowledgePreview" class="preview"></div>
+  </section>
+
+  <section id="tab-portfolio" class="panel tab-panel">
+    <div class="section-title"><h3>Portfolio Manager</h3><p>output tốt phải thành asset</p></div>
+    <div class="form-grid">
+      <label>Name<input id="portfolioName" type="text"></label>
+      <label>Type<input id="portfolioType" type="text"></label>
+      <label>Status<select id="portfolioStatus"><option>Building</option><option>Draft</option><option>Collecting</option><option>Operating</option><option>Published</option></select></label>
+    </div>
+    <button id="addPortfolio" class="btn">Add Portfolio</button>
+    <div id="portfolioPreview" class="preview"></div>
+  </section>
+
+  <section id="tab-review" class="panel tab-panel">
+    <div class="section-title"><h3>Weekly Review</h3><p>4 câu hỏi bắt buộc</p></div>
+    <div class="form-grid">
+      <label>Q1<input id="reviewQ1" type="text"></label>
+      <label>Q2<input id="reviewQ2" type="text"></label>
+      <label>Q3<input id="reviewQ3" type="text"></label>
+      <label>Q4<input id="reviewQ4" type="text"></label>
+    </div>
+    <button id="applyReview" class="btn">Apply Review</button>
+  </section>
+
+  <section class="panel">
+    <h3>Current Data Preview</h3>
+    <textarea id="jsonPreview" spellcheck="false"></textarea>
+    <p id="status" class="muted">Ready.</p>
+  </section>
+</main>
+<script src="assets/js/studio.js"></script>
+</body></html>
