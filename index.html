@@ -1,1 +1,93 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>PBOS v2.0 | Phan Van Ngoc</title><link rel="stylesheet" href="assets/css/style.css"/></head><body><div class="app"><aside class="sidebar"><div class="brand"><div class="logo">PB</div><div><h1>PBOS</h1><p>v2.0 Operating System</p></div></div><nav><a href="#today" class="active">Today</a><a href="#projects">Projects</a><a href="#career">Career</a><a href="#learning">Learning</a><a href="#content">Content</a><a href="#portfolio">Portfolio</a><a href="#settings">Settings</a><a href="admin.html">Admin</a></nav><div class="note"><span>North Star</span><strong id="northStar"></strong></div></aside><main><section id="today" class="hero"><div><div class="eyebrow">Today</div><h2 id="greeting">Good Morning, Ngoc</h2><p id="dateNow" class="muted"></p></div><div id="scoreStrip" class="score-strip"></div></section><section class="panel"><div class="section-title"><h3>Today's Focus</h3><p>3 việc quan trọng nhất trong ngày.</p></div><div id="todayFocus" class="compact-grid"></div></section><section class="panel"><div class="section-title"><h3>Next Actions</h3><p>Không để ý tưởng nằm ngoài hệ thống.</p></div><div id="nextActions" class="action-list"></div></section><section id="projects" class="panel"><div class="section-title"><h3>Projects</h3><p>Dự án tạo năng lực và tài sản.</p></div><div id="projectGrid" class="project-grid"></div></section><section id="career" class="panel"><div class="section-title"><h3>Career Capital</h3><p id="careerRole">Loading...</p></div><div id="careerCapital" class="compact-grid"></div><table><thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead><tbody id="achievementRows"></tbody></table></section><section id="learning" class="panel"><div class="section-title"><h3>Learning OS</h3><p>Học theo JD, dự án và khoảng trống năng lực.</p></div><div id="learningGrid" class="project-grid"></div></section><section id="content" class="panel"><div class="section-title"><h3>Content System</h3><p>Kinh nghiệm thật thành tài sản thương hiệu.</p></div><div id="contentGrid" class="compact-grid"></div></section><section id="portfolio" class="panel"><div class="section-title"><h3>Portfolio</h3><p>Output có bằng chứng và cấu trúc.</p></div><div id="portfolioGrid" class="compact-grid"></div></section><section id="settings" class="panel"><div class="section-title"><h3>Settings</h3><p>Thông tin vận hành public.</p></div><div id="settingsGrid" class="compact-grid"></div></section><footer>PBOS v2.0 · Personal Operating System · Phan Van Ngoc</footer></main></div><script src="assets/js/app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>PBOS v2.1 | Phan Van Ngoc</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">PB</div>
+      <div><h1>PBOS</h1><p id="versionText">v2.1 Compact OS</p></div>
+    </div>
+    <nav>
+      <a href="#today" class="active">Today</a>
+      <a href="#projects">Projects</a>
+      <a href="#career">Career</a>
+      <a href="#learning">Learning</a>
+      <a href="#content">Content</a>
+      <a href="#portfolio">Portfolio</a>
+      <a href="#settings">Settings</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+    <div class="note">
+      <span>North Star</span>
+      <strong id="northStar"></strong>
+    </div>
+  </aside>
+
+  <main>
+    <section id="today" class="hero">
+      <div class="hero-title">
+        <div class="eyebrow">Today</div>
+        <h2 id="greeting">Good Morning, Ngoc</h2>
+        <p id="dateNow" class="muted"></p>
+      </div>
+      <div id="scoreStrip" class="score-strip"></div>
+    </section>
+
+    <section class="split">
+      <div class="panel">
+        <div class="section-title"><h3>Focus</h3><p>Top 3</p></div>
+        <div id="todayFocus" class="compact-grid"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><h3>Next</h3><p>Action list</p></div>
+        <div id="nextActions" class="action-list"></div>
+      </div>
+    </section>
+
+    <section id="projects" class="panel">
+      <div class="section-title"><h3>Projects</h3><p>Control board</p></div>
+      <div id="projectGrid" class="project-grid"></div>
+    </section>
+
+    <section id="career" class="panel">
+      <div class="section-title"><h3>Career Capital</h3><p id="careerRole"></p></div>
+      <div id="careerCapital" class="score-grid"></div>
+      <table>
+        <thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead>
+        <tbody id="achievementRows"></tbody>
+      </table>
+    </section>
+
+    <section id="learning" class="panel">
+      <div class="section-title"><h3>Learning</h3><p>Skill progress</p></div>
+      <div id="learningGrid" class="project-grid"></div>
+    </section>
+
+    <section class="split">
+      <div id="content" class="panel">
+        <div class="section-title"><h3>Content</h3><p>Pillars</p></div>
+        <div id="contentGrid" class="compact-grid one"></div>
+      </div>
+      <div id="portfolio" class="panel">
+        <div class="section-title"><h3>Portfolio</h3><p>Assets</p></div>
+        <div id="portfolioGrid" class="compact-grid one"></div>
+      </div>
+    </section>
+
+    <section id="settings" class="panel">
+      <div class="section-title"><h3>Settings</h3><p>Public operations</p></div>
+      <div id="settingsGrid" class="compact-grid"></div>
+    </section>
+
+    <footer>PBOS v2.1 · Compact Operating System · Phan Van Ngoc</footer>
+  </main>
+</div>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

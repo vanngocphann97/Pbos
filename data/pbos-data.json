@@ -1,10 +1,11 @@
 {
   "meta": {
-    "version": "2.0",
+    "version": "2.1",
     "owner": "Phan Van Ngoc",
     "title": "PBOS",
-    "subtitle": "Personal Operating System",
-    "northStar": "Build systems. Create value. Inspire people."
+    "subtitle": "Compact Operating System",
+    "northStar": "Build systems. Create value. Inspire people.",
+    "mode": "Public"
   },
   "today": {
     "focus": [
@@ -19,15 +20,15 @@
         "status": "Doing"
       },
       {
-        "title": "PBOS v2.0",
+        "title": "PBOS v2.1",
         "type": "Product",
         "status": "Build"
       }
     ],
     "nextActions": [
-      "Kiểm tra dữ liệu public trước khi upload GitHub",
+      "Rà soát dữ liệu public trước khi upload GitHub",
       "Cập nhật Career Capital",
-      "Chốt 01 output trong ngày"
+      "Chốt 01 output rõ trong ngày"
     ]
   },
   "scores": [
@@ -46,42 +47,57 @@
     {
       "name": "Brand",
       "value": 38
+    },
+    {
+      "name": "Portfolio",
+      "value": 34
+    },
+    {
+      "name": "Readiness",
+      "value": 58
     }
   ],
   "projects": [
     {
       "name": "PBOS",
-      "progress": 62,
+      "progress": 68,
       "priority": "High",
-      "next": "Deploy v2.0",
+      "next": "Deploy v2.1",
       "status": "Active"
     },
     {
-      "name": "FBO / ERP Governance",
+      "name": "FBO / ERP",
       "progress": 55,
       "priority": "High",
       "next": "Review permission matrix",
       "status": "Active"
     },
     {
-      "name": "IT Policy Program",
+      "name": "IT Policy",
       "progress": 35,
       "priority": "High",
       "next": "Complete appendix structure",
       "status": "Risk"
     },
     {
-      "name": "M365 Governance",
+      "name": "M365",
       "progress": 48,
       "priority": "Medium",
       "next": "Review SharePoint permission",
       "status": "Active"
     },
     {
-      "name": "Network & Security",
+      "name": "Network",
       "progress": 50,
       "priority": "Medium",
       "next": "Update topology",
+      "status": "Active"
+    },
+    {
+      "name": "IT Master",
+      "progress": 40,
+      "priority": "Medium",
+      "next": "Clean master data",
       "status": "Active"
     }
   ],
@@ -104,6 +120,14 @@
       {
         "name": "Career Score",
         "value": 87
+      },
+      {
+        "name": "Promotion Readiness",
+        "value": 58
+      },
+      {
+        "name": "Public Assets",
+        "value": 6
       }
     ],
     "achievements": [

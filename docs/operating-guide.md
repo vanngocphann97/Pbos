@@ -1,3 +1,5 @@
-# PBOS v2.0 Guide
+# PBOS v2.1 Guide
 
-Cập nhật dữ liệu tại `admin.html`, export `pbos-data.json`, upload vào `data/pbos-data.json` trên GitHub.
+Mục tiêu: gọn hơn v2.0, ít chữ, dễ nhìn nhanh.
+
+Cập nhật dữ liệu tại `admin.html`, export `pbos-data.json`, upload vào `data/pbos-data.json`.

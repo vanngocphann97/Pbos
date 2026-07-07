@@ -1,4 +1,4 @@
-# PBOS v2.0 — Operating System
+# PBOS v2.1 — Compact OS
 
 Upload toàn bộ gói lên GitHub repo `Pbos`.
 

@@ -1,1 +1,38 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>PBOS Admin v2.0</title><link rel="stylesheet" href="assets/css/style.css"/></head><body><main class="admin"><section class="panel admin-head"><div><div class="eyebrow">PBOS Studio</div><h2>Admin v2.0</h2><p class="muted">Sửa dữ liệu trung tâm, export JSON, upload lại lên GitHub. Không cần Python.</p></div><div class="actions"><a href="index.html" class="btn secondary">View</a><button id="loadData" class="btn">Load</button><button id="formatData" class="btn secondary">Format</button><button id="validateData" class="btn secondary">Validate</button><button id="exportData" class="btn">Export</button></div></section><section class="panel"><h3>Data Editor</h3><p class="muted">File xuất ra phải đặt đúng tại <code>data/pbos-data.json</code> trong GitHub.</p><textarea id="editor" spellcheck="false"></textarea><p id="status" class="muted">Ready.</p></section><section class="panel"><h3>Public Mode Rule</h3><p class="muted">Không đưa dữ liệu mật, quyết định scan, hợp đồng, CCCD, tài chính, thông tin nhân sự/khách hàng lên GitHub Public.</p></section></main><script src="assets/js/admin.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>PBOS Admin v2.1</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<main class="admin">
+  <section class="panel admin-head">
+    <div>
+      <div class="eyebrow">PBOS Studio</div>
+      <h2>Admin v2.1</h2>
+      <p class="muted">Sửa dữ liệu, export JSON, upload lên GitHub. Không cần Python.</p>
+    </div>
+    <div class="actions">
+      <a href="index.html" class="btn secondary">View</a>
+      <button id="loadData" class="btn">Load</button>
+      <button id="formatData" class="btn secondary">Format</button>
+      <button id="validateData" class="btn secondary">Validate</button>
+      <button id="exportData" class="btn">Export</button>
+    </div>
+  </section>
+  <section class="panel">
+    <h3>Data Editor</h3>
+    <p class="muted">Xuất file và upload đúng vị trí: <code>data/pbos-data.json</code></p>
+    <textarea id="editor" spellcheck="false"></textarea>
+    <p id="status" class="muted">Ready.</p>
+  </section>
+  <section class="panel">
+    <h3>Public Mode Rule</h3>
+    <p class="muted">Không đưa dữ liệu mật, quyết định scan, hợp đồng, CCCD, tài chính, thông tin nhân sự/khách hàng lên GitHub Public.</p>
+  </section>
+</main>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
