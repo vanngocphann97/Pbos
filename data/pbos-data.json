@@ -1,230 +1,199 @@
 {
   "meta": {
-    "version": "1.3",
+    "version": "2.0",
     "owner": "Phan Van Ngoc",
     "title": "PBOS",
-    "subtitle": "Personal Brand Operating System",
+    "subtitle": "Personal Operating System",
     "northStar": "Build systems. Create value. Inspire people."
   },
   "today": {
     "focus": [
       {
-        "type": "Focus 01",
         "title": "IT Policy",
-        "note": "Chốt khung quy định và phụ lục."
+        "type": "System",
+        "status": "Focus"
       },
       {
-        "type": "Focus 02",
-        "title": "FBO",
-        "note": "Rà soát phân quyền và master data."
+        "title": "FBO Review",
+        "type": "ERP",
+        "status": "Doing"
       },
       {
-        "type": "Focus 03",
-        "title": "PBOS",
-        "note": "Cập nhật bản v1.3 Standalone Admin."
+        "title": "PBOS v2.0",
+        "type": "Product",
+        "status": "Build"
       }
     ],
-    "currentFocus": {
-      "title": "Chuẩn hóa trước khi mở rộng",
-      "note": "Ưu tiên dữ liệu gọn, ít module, dùng được hằng ngày."
-    },
-    "mainRisk": {
-      "title": "Quá nhiều ý tưởng, thiếu output",
-      "note": "Mỗi tuần phải có 01 tài sản rõ ràng."
-    },
-    "nextOutput": {
-      "title": "PBOS v1.3 chạy ổn",
-      "note": "Dùng admin.html để cập nhật dữ liệu, không sửa code."
-    }
-  },
-  "kpi": {
-    "executionScore": 78,
-    "note": "Cập nhật mỗi thứ Sáu.",
-    "metrics": [
-      {
-        "value": "78",
-        "label": "Execution Score"
-      },
-      {
-        "value": "5",
-        "label": "Career Achievements"
-      },
-      {
-        "value": "6",
-        "label": "Active Projects"
-      },
-      {
-        "value": "12",
-        "label": "Portfolio Target"
-      }
+    "nextActions": [
+      "Kiểm tra dữ liệu public trước khi upload GitHub",
+      "Cập nhật Career Capital",
+      "Chốt 01 output trong ngày"
     ]
   },
+  "scores": [
+    {
+      "name": "Execution",
+      "value": 82
+    },
+    {
+      "name": "Career",
+      "value": 87
+    },
+    {
+      "name": "Learning",
+      "value": 45
+    },
+    {
+      "name": "Brand",
+      "value": 38
+    }
+  ],
+  "projects": [
+    {
+      "name": "PBOS",
+      "progress": 62,
+      "priority": "High",
+      "next": "Deploy v2.0",
+      "status": "Active"
+    },
+    {
+      "name": "FBO / ERP Governance",
+      "progress": 55,
+      "priority": "High",
+      "next": "Review permission matrix",
+      "status": "Active"
+    },
+    {
+      "name": "IT Policy Program",
+      "progress": 35,
+      "priority": "High",
+      "next": "Complete appendix structure",
+      "status": "Risk"
+    },
+    {
+      "name": "M365 Governance",
+      "progress": 48,
+      "priority": "Medium",
+      "next": "Review SharePoint permission",
+      "status": "Active"
+    },
+    {
+      "name": "Network & Security",
+      "progress": 50,
+      "priority": "Medium",
+      "next": "Update topology",
+      "status": "Active"
+    }
+  ],
   "career": {
+    "currentRole": "IT System Administrator",
+    "targetRole": "IT Manager / Digital Transformation Lead",
     "capital": [
       {
-        "value": "5",
-        "label": "Awards / Achievements"
+        "name": "Awards",
+        "value": 5
       },
       {
-        "value": "4",
-        "label": "Chiến sĩ thi đua cơ sở"
+        "name": "Certificates",
+        "value": 0
       },
       {
-        "value": "1",
-        "label": "Bằng khen UBND TP.HCM"
+        "name": "Case Studies",
+        "value": 3
       },
       {
-        "value": "87",
-        "label": "Career Capital Score"
+        "name": "Career Score",
+        "value": 87
       }
     ],
     "achievements": [
       {
         "year": "2025",
         "title": "Chiến sĩ thi đua cơ sở",
-        "source": "Benthanh House",
-        "evidence": "Bổ sung số QĐ/PDF",
-        "note": "Thành tích cá nhân năm 2025."
+        "source": "Benthanh House"
       },
       {
         "year": "2024",
         "title": "Chiến sĩ thi đua cơ sở",
-        "source": "Benthanh House",
-        "evidence": "Bổ sung số QĐ/PDF",
-        "note": "Thành tích cá nhân năm 2024."
+        "source": "Benthanh House"
       },
       {
         "year": "2023",
         "title": "Bằng khen Chủ tịch UBND TP.HCM",
-        "source": "UBND TP.HCM",
-        "evidence": "Bổ sung số QĐ/PDF",
-        "note": "Hoàn thành xuất sắc nhiệm vụ 2021–2022."
+        "source": "UBND TP.HCM"
       },
       {
         "year": "2022",
         "title": "Chiến sĩ thi đua cơ sở",
-        "source": "Benthanh House",
-        "evidence": "Bổ sung số QĐ/PDF",
-        "note": "Thành tích cá nhân năm 2022."
+        "source": "Benthanh House"
       },
       {
         "year": "2021",
         "title": "Chiến sĩ thi đua cơ sở",
-        "source": "Benthanh House",
-        "evidence": "Bổ sung số QĐ/PDF",
-        "note": "Thành tích cá nhân năm 2021."
+        "source": "Benthanh House"
       }
     ]
   },
-  "projects": [
+  "learning": [
     {
-      "name": "FBO / ERP Governance",
-      "goal": "Dữ liệu, phân quyền, biểu mẫu, luồng duyệt.",
-      "progress": 55,
-      "status": "Đang làm"
+      "name": "ITIL Foundation",
+      "progress": 30,
+      "priority": "P1"
     },
     {
-      "name": "IT Policy Program",
-      "goal": "01 quy định chung + 06 phụ lục CNTT.",
-      "progress": 35,
-      "status": "Cần đẩy"
+      "name": "CCNA Basics",
+      "progress": 20,
+      "priority": "P2"
     },
     {
-      "name": "M365 Governance",
-      "goal": "Email, Teams, SharePoint, OneDrive, MFA.",
-      "progress": 48,
-      "status": "Đang làm"
+      "name": "Security+ / ISO 27001",
+      "progress": 15,
+      "priority": "P3"
     },
     {
-      "name": "Network & Security",
-      "goal": "Topology, firewall, backup, VLAN, camera.",
-      "progress": 50,
-      "status": "Đang làm"
-    },
-    {
-      "name": "PBOS Website",
-      "goal": "Standalone website + Admin Mode.",
-      "progress": 65,
-      "status": "v1.3"
-    },
-    {
-      "name": "IT Master Database",
-      "goal": "Tài sản, dịch vụ, tài khoản, hợp đồng, sự cố.",
-      "progress": 40,
-      "status": "Đang làm"
+      "name": "Power BI",
+      "progress": 45,
+      "priority": "P4"
     }
   ],
-  "learning": {
-    "roadmap": [
-      {
-        "name": "ITIL Foundation",
-        "priority": "Ưu tiên 1",
-        "target": "Nền tảng IT Service Management.",
-        "progress": 30
-      },
-      {
-        "name": "CCNA Basics",
-        "priority": "Ưu tiên 2",
-        "target": "Network core cho vận hành hạ tầng.",
-        "progress": 20
-      },
-      {
-        "name": "Security+ / ISO 27001",
-        "priority": "Ưu tiên 3",
-        "target": "Bảo mật và tuân thủ.",
-        "progress": 15
-      },
-      {
-        "name": "Power BI",
-        "priority": "Ưu tiên 4",
-        "target": "Báo cáo thành dashboard.",
-        "progress": 45
-      }
-    ],
-    "skills": [
-      "IT Governance",
-      "ERP/FBO",
-      "Microsoft 365",
-      "Network",
-      "Security",
-      "Power BI",
-      "Documentation",
-      "Process Design",
-      "Content System"
-    ]
-  },
   "content": [
     {
       "pillar": "System & IT Governance",
-      "angle": "Quy định CNTT, phân quyền, bảo mật, vận hành.",
-      "output": "4 bài/tháng"
+      "target": "4 bài/tháng",
+      "status": "Active"
     },
     {
       "pillar": "Automation & BI",
-      "angle": "Excel Master, SharePoint, dashboard, workflow.",
-      "output": "3 bài/tháng"
+      "target": "3 bài/tháng",
+      "status": "Active"
     },
     {
       "pillar": "ERP / FBO",
-      "angle": "Master data, luồng duyệt, ma trận quyền.",
-      "output": "3 bài/tháng"
+      "target": "3 bài/tháng",
+      "status": "Active"
     }
   ],
   "portfolio": [
     {
       "name": "IT Master System",
-      "description": "Bộ quản trị tài sản, dịch vụ, tài khoản, hợp đồng.",
-      "status": "Đang xây"
+      "type": "Dashboard",
+      "status": "Building"
     },
     {
       "name": "Network Topology",
-      "description": "Sơ đồ hạ tầng mạng, VLAN, firewall, NAS, server.",
-      "status": "Đang chuẩn hóa"
+      "type": "Diagram",
+      "status": "Draft"
     },
     {
       "name": "FBO Governance Case Study",
-      "description": "Case triển khai ERP/FBO thực tế.",
-      "status": "Đang thu thập"
+      "type": "Case Study",
+      "status": "Collecting"
     }
-  ]
+  ],
+  "settings": {
+    "publicMode": true,
+    "dataFile": "data/pbos-data.json",
+    "repository": "vanngocphann97/Pbos",
+    "website": "https://vanngocphann97.github.io/Pbos/"
+  }
 }
