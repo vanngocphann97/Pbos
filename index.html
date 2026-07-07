@@ -3,568 +3,139 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PBOS Command Center | Phan Van Ngoc</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --panel-2: #1f2937;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --line: #334155;
-      --accent: #38bdf8;
-      --good: #22c55e;
-      --warn: #f59e0b;
-      --bad: #ef4444;
-      --white: #ffffff;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Inter, Arial, sans-serif;
-      background: radial-gradient(circle at top left, #1e3a8a 0, #0f172a 36%, #020617 100%);
-      color: var(--text);
-      line-height: 1.5;
-      min-height: 100vh;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      min-height: 100vh;
-    }
-
-    aside {
-      border-right: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.9);
-      padding: 28px 22px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-    }
-
-    .brand {
-      margin-bottom: 34px;
-    }
-
-    .brand .logo {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, #38bdf8, #2563eb);
-      color: white;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-
-    .brand h1 {
-      font-size: 18px;
-      letter-spacing: -0.02em;
-    }
-
-    .brand p {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    nav a {
-      display: block;
-      color: var(--muted);
-      text-decoration: none;
-      padding: 11px 12px;
-      border-radius: 10px;
-      margin-bottom: 6px;
-      font-size: 14px;
-    }
-
-    nav a:hover,
-    nav a.active {
-      background: rgba(56, 189, 248, 0.12);
-      color: var(--white);
-    }
-
-    .sidebar-note {
-      margin-top: 30px;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(31, 41, 55, 0.55);
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    main {
-      padding: 32px;
-      max-width: 1280px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.6fr 0.9fr;
-      gap: 20px;
-      margin-bottom: 24px;
-    }
-
-    .card {
-      background: rgba(17, 24, 39, 0.82);
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      border-radius: 22px;
-      padding: 22px;
-      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
-      backdrop-filter: blur(10px);
-    }
-
-    .eyebrow {
-      color: var(--accent);
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    h2 {
-      font-size: 30px;
-      letter-spacing: -0.04em;
-      line-height: 1.15;
-      margin-bottom: 14px;
-    }
-
-    h3 {
-      font-size: 18px;
-      margin-bottom: 14px;
-      letter-spacing: -0.02em;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .slogan {
-      font-size: 16px;
-      color: #cbd5e1;
-      margin-bottom: 20px;
-    }
-
-    .focus-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .focus-item {
-      background: rgba(31, 41, 55, 0.7);
-      border: 1px solid var(--line);
-      padding: 14px;
-      border-radius: 16px;
-    }
-
-    .focus-item strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-
-    .focus-item span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .score {
-      font-size: 54px;
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: -0.06em;
-      color: var(--white);
-    }
-
-    .score small {
-      font-size: 18px;
-      color: var(--muted);
-    }
-
-    .progress {
-      height: 9px;
-      background: #020617;
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 14px;
-      border: 1px solid var(--line);
-    }
-
-    .bar {
-      height: 100%;
-      background: linear-gradient(90deg, #38bdf8, #22c55e);
-      width: var(--w);
-    }
-
-    section {
-      margin-top: 24px;
-    }
-
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .metric {
-      min-height: 134px;
-    }
-
-    .metric .value {
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
-
-    .metric .label {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      color: #bae6fd;
-      font-size: 12px;
-      margin-top: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      overflow: hidden;
-      font-size: 14px;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 13px 10px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-
-    th {
-      color: #cbd5e1;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 700;
-    }
-
-    td {
-      color: #e5e7eb;
-    }
-
-    .status {
-      font-size: 12px;
-      border-radius: 999px;
-      padding: 4px 8px;
-      display: inline-block;
-      white-space: nowrap;
-    }
-
-    .doing { background: rgba(56, 189, 248, 0.14); color: #7dd3fc; }
-    .done { background: rgba(34, 197, 94, 0.14); color: #86efac; }
-    .risk { background: rgba(245, 158, 11, 0.14); color: #fcd34d; }
-
-    .list {
-      display: grid;
-      gap: 11px;
-    }
-
-    .list-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 13px;
-      border-radius: 14px;
-      background: rgba(31, 41, 55, 0.54);
-      border: 1px solid var(--line);
-    }
-
-    .list-item span {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .footer {
-      margin: 30px 0 8px;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-    }
-
-    @media (max-width: 960px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      aside {
-        position: relative;
-        height: auto;
-      }
-
-      .hero,
-      .grid-4,
-      .grid-3,
-      .focus-grid {
-        grid-template-columns: 1fr;
-      }
-
-      main {
-        padding: 18px;
-      }
-    }
-  </style>
+  <title>PBOS | Phan Van Ngoc</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-  <div class="layout">
-    <aside>
-      <div class="brand">
-        <div class="logo">PB</div>
-        <h1>PBOS Command Center</h1>
-        <p>Phan Van Ngoc · System · Automation · Digital Transformation</p>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-mark">PB</div>
+        <div>
+          <h1>PBOS</h1>
+          <p>Personal Brand Operating System</p>
+        </div>
       </div>
 
-      <nav>
-        <a class="active" href="#dashboard">Dashboard</a>
-        <a href="#kpi">KPI Dashboard</a>
+      <nav class="nav">
+        <a href="#dashboard" class="active">Dashboard</a>
+        <a href="#career">Career 2035</a>
+        <a href="#kpi">KPI</a>
         <a href="#projects">Projects</a>
-        <a href="#learning">Learning Roadmap</a>
-        <a href="#content">Content System</a>
+        <a href="#learning">Learning</a>
+        <a href="#content">Content</a>
         <a href="#portfolio">Portfolio</a>
       </nav>
 
-      <div class="sidebar-note">
-        North Star: Build systems. Create value. Inspire people.
+      <div class="sidebar-card">
+        <span>North Star</span>
+        <strong>Build systems. Create value. Inspire people.</strong>
       </div>
     </aside>
 
-    <main>
-      <section id="dashboard" class="hero">
-        <div class="card">
-          <div class="eyebrow">Career Operating System 2035</div>
-          <h2>Không quản lý cuộc đời bằng cảm hứng. Quản lý bằng hệ thống, KPI và hành động lặp lại.</h2>
-          <p class="slogan">Mục tiêu: trở thành nhân sự quản trị hệ thống, chuyển đổi số và vận hành doanh nghiệp có năng lực thực chiến, có portfolio rõ, có thương hiệu cá nhân chuyên nghiệp.</p>
+    <main class="main">
+      <section id="dashboard" class="hero-grid">
+        <div class="panel hero-panel">
+          <p class="eyebrow">Career Operating System 2035</p>
+          <h2>Điều hành sự nghiệp bằng hệ thống, dữ liệu và output đo được.</h2>
+          <p class="lead">PBOS là bảng điều khiển trung tâm cho mục tiêu nghề nghiệp, dự án, năng lực, nội dung, portfolio và thương hiệu cá nhân của Phan Van Ngoc.</p>
 
-          <div class="focus-grid">
-            <div class="focus-item">
-              <strong>System</strong>
-              <span>IT Governance, M365, Network, Security</span>
-            </div>
-            <div class="focus-item">
-              <strong>Automation</strong>
-              <span>ERP/FBO, BI, workflow, dashboard</span>
-            </div>
-            <div class="focus-item">
-              <strong>Brand</strong>
-              <span>Content, case study, portfolio, career capital</span>
-            </div>
+          <div class="pillar-grid">
+            <div><strong>System</strong><span>IT Governance · M365 · Network · Security</span></div>
+            <div><strong>Automation</strong><span>ERP/FBO · BI · Workflow · Dashboard</span></div>
+            <div><strong>Brand</strong><span>Content · Case Study · Portfolio · Career Capital</span></div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="eyebrow">Monthly Execution Score</div>
-          <div class="score">72<small>/100</small></div>
-          <p class="muted">Điểm mẫu. Cập nhật theo KPI thật mỗi cuối tuần.</p>
-          <div class="progress"><div class="bar" style="--w:72%"></div></div>
-          <div class="list" style="margin-top:18px">
-            <div class="list-item"><strong>Focus tuần</strong><span>IT Policy</span></div>
-            <div class="list-item"><strong>Output chính</strong><span>01 báo cáo</span></div>
-            <div class="list-item"><strong>Content</strong><span>02 bài</span></div>
+        <div class="panel score-panel">
+          <p class="eyebrow">Execution Score</p>
+          <div class="score"><span id="execution-score">--</span><small>/100</small></div>
+          <div class="progress"><div id="execution-bar" class="bar"></div></div>
+          <p class="muted" id="execution-note">Loading data...</p>
+        </div>
+      </section>
+
+      <section id="career" class="section-grid two">
+        <div class="panel">
+          <h3>Career 2035</h3>
+          <p class="muted">Định vị dài hạn: chuyên gia quản trị hệ thống, chuyển đổi số và vận hành doanh nghiệp có năng lực triển khai thực chiến.</p>
+          <div id="career-roadmap" class="timeline"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Weekly Operating Rhythm</h3>
+          <div class="list">
+            <div><strong>Thứ 2</strong><span>Review tuần · họp TGĐ · xác định output</span></div>
+            <div><strong>Thứ 4</strong><span>Ban CNTT · dự án hệ thống · xử lý blocking</span></div>
+            <div><strong>Thứ 6</strong><span>Chốt báo cáo · cập nhật KPI · archive hồ sơ</span></div>
+            <div><strong>Cuối tuần</strong><span>Học chứng chỉ · viết case study · nâng cấp PBOS</span></div>
           </div>
         </div>
       </section>
 
       <section id="kpi">
-        <div class="grid-4">
-          <div class="card metric">
-            <div class="value">6</div>
-            <div class="label">Dự án trọng điểm đang theo dõi</div>
-            <span class="tag">Projects</span>
-          </div>
-          <div class="card metric">
-            <div class="value">2/3</div>
-            <div class="label">Bài viết thương hiệu cá nhân mỗi tuần</div>
-            <span class="tag">Content</span>
-          </div>
-          <div class="card metric">
-            <div class="value">45%</div>
-            <div class="label">Tiến độ chứng chỉ 6 tháng</div>
-            <span class="tag">Learning</span>
-          </div>
-          <div class="card metric">
-            <div class="value">12</div>
-            <div class="label">Case study / tài sản portfolio mục tiêu</div>
-            <span class="tag">Portfolio</span>
-          </div>
+        <div class="section-head">
+          <h3>KPI Dashboard</h3>
+          <p>Cập nhật trong file <code>data/kpi.json</code></p>
         </div>
+        <div id="kpi-cards" class="metric-grid"></div>
       </section>
 
       <section id="projects">
-        <div class="card">
+        <div class="section-head">
           <h3>Project Control Board</h3>
+          <p>Các dự án tạo năng lực thật và tài sản portfolio.</p>
+        </div>
+        <div class="panel table-panel">
           <table>
             <thead>
               <tr>
                 <th>Dự án</th>
                 <th>Mục tiêu</th>
                 <th>KPI</th>
+                <th>Tiến độ</th>
                 <th>Trạng thái</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>FBO / ERP Governance</td>
-                <td>Chuẩn hóa dữ liệu, phân quyền, quy trình vận hành</td>
-                <td>100% master data + ma trận quyền</td>
-                <td><span class="status doing">Đang làm</span></td>
-              </tr>
-              <tr>
-                <td>IT Policy Program</td>
-                <td>01 quy định chung + 06 phụ lục CNTT</td>
-                <td>Ban hành trước 02/2026</td>
-                <td><span class="status risk">Cần đẩy</span></td>
-              </tr>
-              <tr>
-                <td>M365 Governance</td>
-                <td>Quản trị email, Teams, SharePoint, OneDrive</td>
-                <td>MFA + cấu trúc dữ liệu + phân quyền</td>
-                <td><span class="status doing">Đang làm</span></td>
-              </tr>
-              <tr>
-                <td>Network & Security</td>
-                <td>Sơ đồ mạng, firewall, backup, camera, VLAN</td>
-                <td>01 sơ đồ + 01 checklist vận hành</td>
-                <td><span class="status doing">Đang làm</span></td>
-              </tr>
-              <tr>
-                <td>PBOS Website</td>
-                <td>Dashboard cá nhân + portfolio công khai</td>
-                <td>HTML v1 + deploy GitHub Pages</td>
-                <td><span class="status doing">Mới khởi tạo</span></td>
-              </tr>
-            </tbody>
+            <tbody id="project-table"></tbody>
           </table>
         </div>
       </section>
 
-      <section id="learning">
-        <div class="grid-3">
-          <div class="card">
-            <h3>Learning Roadmap</h3>
-            <div class="list">
-              <div class="list-item"><strong>ITIL Foundation</strong><span>Ưu tiên 1</span></div>
-              <div class="list-item"><strong>CCNA Basics</strong><span>Ưu tiên 2</span></div>
-              <div class="list-item"><strong>Security+ / ISO 27001 Awareness</strong><span>Ưu tiên 3</span></div>
-              <div class="list-item"><strong>Power BI / Dashboard</strong><span>Ưu tiên 4</span></div>
-            </div>
-          </div>
+      <section id="learning" class="section-grid two">
+        <div class="panel">
+          <h3>Learning Roadmap</h3>
+          <div id="learning-list" class="stack"></div>
+        </div>
 
-          <div class="card">
-            <h3>Weekly Operating Rhythm</h3>
-            <div class="list">
-              <div class="list-item"><strong>Thứ 2</strong><span>Review công việc + họp TGĐ</span></div>
-              <div class="list-item"><strong>Thứ 4</strong><span>Ban CNTT / dự án hệ thống</span></div>
-              <div class="list-item"><strong>Thứ 6</strong><span>Chốt báo cáo + dashboard</span></div>
-              <div class="list-item"><strong>Cuối tuần</strong><span>Học + viết case study</span></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>Personal KPI Rules</h3>
-            <div class="list">
-              <div class="list-item"><strong>Không mơ hồ</strong><span>Việc nào cũng có output</span></div>
-              <div class="list-item"><strong>Không học lan man</strong><span>Học theo JD và dự án</span></div>
-              <div class="list-item"><strong>Không làm rời rạc</strong><span>Mọi thứ đưa vào PBOS</span></div>
-              <div class="list-item"><strong>Không chỉ làm thầm</strong><span>Biến kết quả thành portfolio</span></div>
-            </div>
-          </div>
+        <div class="panel">
+          <h3>Skill Stack</h3>
+          <div id="skill-list" class="tag-cloud"></div>
         </div>
       </section>
 
       <section id="content">
-        <div class="card">
+        <div class="section-head">
           <h3>Content System</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Trụ cột</th>
-                <th>Góc viết</th>
-                <th>Đầu ra mỗi tháng</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>System & IT Governance</td>
-                <td>Quy định CNTT, phân quyền, bảo mật, vận hành</td>
-                <td>4 bài</td>
-              </tr>
-              <tr>
-                <td>Automation & BI</td>
-                <td>Dashboard, Excel Master, SharePoint List, workflow</td>
-                <td>3 bài</td>
-              </tr>
-              <tr>
-                <td>ERP / FBO</td>
-                <td>Chuẩn hóa dữ liệu, luồng duyệt, ma trận quyền</td>
-                <td>3 bài</td>
-              </tr>
-              <tr>
-                <td>Career & Leadership</td>
-                <td>Kỷ luật nghề nghiệp, học chứng chỉ, quản trị bản thân</td>
-                <td>2 bài</td>
-              </tr>
-            </tbody>
-          </table>
+          <p>Biến kinh nghiệm làm việc thành tài sản thương hiệu.</p>
         </div>
+        <div id="content-grid" class="content-grid"></div>
       </section>
 
       <section id="portfolio">
-        <div class="grid-3">
-          <div class="card">
-            <h3>Portfolio Assets</h3>
-            <p class="muted">Tài sản cần đóng gói: IT Master, sơ đồ mạng, quy định CNTT, báo cáo FBO, dashboard KPI, case study M365.</p>
-          </div>
-
-          <div class="card">
-            <h3>Achievements</h3>
-            <p class="muted">Chiến sĩ thi đua cơ sở 2021, 2022, 2024, 2025. Bằng khen Chủ tịch UBND TP.HCM năm 2023.</p>
-          </div>
-
-          <div class="card">
-            <h3>Public Positioning</h3>
-            <p class="muted">Người xây dựng hệ thống vận hành thực tế cho doanh nghiệp nhỏ và vừa: IT, ERP, automation, governance.</p>
-          </div>
+        <div class="section-head">
+          <h3>Portfolio Assets</h3>
+          <p>Chỉ đưa vào portfolio các output có bằng chứng, có cấu trúc, có giá trị dùng lại.</p>
         </div>
+        <div id="portfolio-grid" class="content-grid"></div>
       </section>
 
-      <div class="footer">
-        PBOS Command Center · HTML Prototype v1 · Phan Van Ngoc
-      </div>
+      <footer>
+        PBOS v1 · Phan Van Ngoc · Designed for 10-year execution
+      </footer>
     </main>
   </div>
+
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
