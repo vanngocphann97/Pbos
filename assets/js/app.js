@@ -1,6 +1,6 @@
-async function loadJSON(path) {
-  const res = await fetch(path);
-  if (!res.ok) throw new Error(path);
+async function loadData() {
+  const res = await fetch("data/pbos-data.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("Cannot load data/pbos-data.json");
   return res.json();
 }
 
@@ -14,8 +14,14 @@ function setDate() {
   });
 }
 
+function renderMeta(data) {
+  document.getElementById("app-title").textContent = data.meta.title;
+  document.getElementById("app-subtitle").textContent = data.meta.subtitle;
+  document.getElementById("north-star").textContent = data.meta.northStar;
+}
+
 function renderToday(data) {
-  document.getElementById("today-focus").innerHTML = data.focus.map(x => `
+  document.getElementById("today-focus").innerHTML = data.today.focus.map(x => `
     <div class="focus">
       <span>${x.type}</span>
       <strong>${x.title}</strong>
@@ -23,20 +29,20 @@ function renderToday(data) {
     </div>
   `).join("");
 
-  document.getElementById("current-focus").textContent = data.currentFocus.title;
-  document.getElementById("current-focus-note").textContent = data.currentFocus.note;
-  document.getElementById("main-risk").textContent = data.mainRisk.title;
-  document.getElementById("main-risk-note").textContent = data.mainRisk.note;
-  document.getElementById("next-output").textContent = data.nextOutput.title;
-  document.getElementById("next-output-note").textContent = data.nextOutput.note;
+  document.getElementById("current-focus").textContent = data.today.currentFocus.title;
+  document.getElementById("current-focus-note").textContent = data.today.currentFocus.note;
+  document.getElementById("main-risk").textContent = data.today.mainRisk.title;
+  document.getElementById("main-risk-note").textContent = data.today.mainRisk.note;
+  document.getElementById("next-output").textContent = data.today.nextOutput.title;
+  document.getElementById("next-output-note").textContent = data.today.nextOutput.note;
 }
 
 function renderKPI(data) {
-  document.getElementById("execution-score").textContent = data.executionScore;
-  document.getElementById("execution-bar").style.width = data.executionScore + "%";
-  document.getElementById("execution-note").textContent = data.note;
+  document.getElementById("execution-score").textContent = data.kpi.executionScore;
+  document.getElementById("execution-bar").style.width = data.kpi.executionScore + "%";
+  document.getElementById("execution-note").textContent = data.kpi.note;
 
-  document.getElementById("score").innerHTML = data.metrics.map(x => `
+  document.getElementById("score").innerHTML = data.kpi.metrics.map(x => `
     <div class="metric">
       <div class="value">${x.value}</div>
       <div class="name">${x.label}</div>
@@ -45,14 +51,14 @@ function renderKPI(data) {
 }
 
 function renderCareer(data) {
-  document.getElementById("career-capital").innerHTML = data.capital.map(x => `
+  document.getElementById("career-capital").innerHTML = data.career.capital.map(x => `
     <div class="metric">
       <div class="value">${x.value}</div>
       <div class="name">${x.label}</div>
     </div>
   `).join("");
 
-  document.getElementById("achievement-table").innerHTML = data.achievements.map(x => `
+  document.getElementById("achievement-table").innerHTML = data.career.achievements.map(x => `
     <tr>
       <td>${x.year}</td>
       <td><strong>${x.title}</strong><br><span class="muted">${x.note}</span></td>
@@ -63,7 +69,7 @@ function renderCareer(data) {
 }
 
 function renderProjects(data) {
-  document.getElementById("projects-grid").innerHTML = data.map(x => `
+  document.getElementById("projects-grid").innerHTML = data.projects.map(x => `
     <div class="project">
       <strong>${x.name}</strong>
       <p>${x.goal}</p>
@@ -74,7 +80,7 @@ function renderProjects(data) {
 }
 
 function renderLearning(data) {
-  document.getElementById("learning-list").innerHTML = data.roadmap.map(x => `
+  document.getElementById("learning-list").innerHTML = data.learning.roadmap.map(x => `
     <div class="learn">
       <strong>${x.name}</strong>
       <p>${x.target}</p>
@@ -83,7 +89,7 @@ function renderLearning(data) {
     </div>
   `).join("");
 
-  document.getElementById("skill-list").innerHTML = data.skills.map(x => `<span class="tag">${x}</span>`).join("");
+  document.getElementById("skill-list").innerHTML = data.learning.skills.map(x => `<span class="tag">${x}</span>`).join("");
 }
 
 function renderCards(id, data) {
@@ -98,26 +104,18 @@ function renderCards(id, data) {
 
 async function init() {
   setDate();
-  const [today, kpi, career, projects, learning, content, portfolio] = await Promise.all([
-    loadJSON("data/today.json"),
-    loadJSON("data/kpi.json"),
-    loadJSON("data/achievements.json"),
-    loadJSON("data/projects.json"),
-    loadJSON("data/learning.json"),
-    loadJSON("data/content.json"),
-    loadJSON("data/portfolio.json")
-  ]);
-
-  renderToday(today);
-  renderKPI(kpi);
-  renderCareer(career);
-  renderProjects(projects);
-  renderLearning(learning);
-  renderCards("content-grid", content);
-  renderCards("portfolio-grid", portfolio);
+  const data = await loadData();
+  renderMeta(data);
+  renderToday(data);
+  renderKPI(data);
+  renderCareer(data);
+  renderProjects(data);
+  renderLearning(data);
+  renderCards("content-grid", data.content);
+  renderCards("portfolio-grid", data.portfolio);
 }
 
 init().catch(err => {
   console.error(err);
-  document.body.insertAdjacentHTML("afterbegin", "<div style='padding:12px;background:#7f1d1d;color:white'>PBOS data loading error. Check data/*.json paths.</div>");
+  document.body.insertAdjacentHTML("afterbegin", "<div style='padding:12px;background:#7f1d1d;color:white'>PBOS data loading error. Check data/pbos-data.json.</div>");
 });

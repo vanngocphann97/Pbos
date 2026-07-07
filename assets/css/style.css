@@ -1,13 +1,12 @@
 :root {
   --bg: #06101f;
-  --panel: rgba(15, 23, 42, .88);
+  --panel: rgba(15, 23, 42, .90);
   --panel2: rgba(30, 41, 59, .58);
   --line: rgba(148, 163, 184, .18);
   --text: #e5e7eb;
   --muted: #94a3b8;
   --accent: #38bdf8;
   --green: #22c55e;
-  --yellow: #f59e0b;
   --white: #fff;
 }
 
@@ -151,9 +150,9 @@ td { color: #e5e7eb; }
 
 .stack { display: grid; gap: 11px; }
 .tags { display: flex; flex-wrap: wrap; gap: 10px; }
-.tag {
+.tag, code {
   display: inline-block;
-  padding: 7px 11px;
+  padding: 5px 9px;
   border-radius: 999px;
   border: 1px solid rgba(56,189,248,.24);
   color: #bae6fd;
@@ -163,10 +162,49 @@ td { color: #e5e7eb; }
 
 footer { text-align: center; color: var(--muted); font-size: 12px; padding: 34px 0 8px; }
 
+.admin-wrap { max-width: 1180px; margin: 0 auto; padding: 28px; }
+.admin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.admin-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  border: 1px solid rgba(56,189,248,.35);
+  background: rgba(56,189,248,.15);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+}
+.btn.ghost { background: rgba(30, 41, 59, .58); border-color: var(--line); }
+.admin-panel { margin-top: 16px; }
+.steps { padding-left: 20px; color: var(--muted); }
+.steps li { margin: 8px 0; }
+#json-editor {
+  width: 100%;
+  min-height: 560px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #020617;
+  color: #e5e7eb;
+  padding: 16px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  outline: none;
+}
+.status-line { margin-top: 10px; }
+
 @media (max-width: 1080px) {
   .shell { grid-template-columns: 1fr; }
   .side { position: relative; height: auto; }
-  main { padding: 18px; }
+  main, .admin-wrap { padding: 18px; }
   .top, .grid-4, .grid-3, .two-col, .focus-row { grid-template-columns: 1fr; }
-  .section-head { display: block; }
+  .section-head, .admin-head { display: block; }
+  .admin-actions { margin-top: 14px; }
 }
