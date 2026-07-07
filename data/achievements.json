@@ -1,0 +1,57 @@
+{
+  "capital": [
+    {
+      "value": "5",
+      "label": "Awards / Achievements"
+    },
+    {
+      "value": "4",
+      "label": "Chiến sĩ thi đua cơ sở"
+    },
+    {
+      "value": "1",
+      "label": "Bằng khen UBND TP.HCM"
+    },
+    {
+      "value": "87",
+      "label": "Career Capital Score"
+    }
+  ],
+  "achievements": [
+    {
+      "year": "2025",
+      "title": "Chiến sĩ thi đua cơ sở",
+      "source": "Benthanh House",
+      "evidence": "Bổ sung số QĐ/PDF",
+      "note": "Thành tích cá nhân năm 2025."
+    },
+    {
+      "year": "2024",
+      "title": "Chiến sĩ thi đua cơ sở",
+      "source": "Benthanh House",
+      "evidence": "Bổ sung số QĐ/PDF",
+      "note": "Thành tích cá nhân năm 2024."
+    },
+    {
+      "year": "2023",
+      "title": "Bằng khen Chủ tịch UBND TP.HCM",
+      "source": "UBND TP.HCM",
+      "evidence": "Bổ sung số QĐ/PDF",
+      "note": "Hoàn thành xuất sắc nhiệm vụ 2021–2022."
+    },
+    {
+      "year": "2022",
+      "title": "Chiến sĩ thi đua cơ sở",
+      "source": "Benthanh House",
+      "evidence": "Bổ sung số QĐ/PDF",
+      "note": "Thành tích cá nhân năm 2022."
+    },
+    {
+      "year": "2021",
+      "title": "Chiến sĩ thi đua cơ sở",
+      "source": "Benthanh House",
+      "evidence": "Bổ sung số QĐ/PDF",
+      "note": "Thành tích cá nhân năm 2021."
+    }
+  ]
+}

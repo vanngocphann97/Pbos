@@ -1,43 +1,37 @@
 [
   {
     "name": "FBO / ERP Governance",
-    "goal": "Chuẩn hóa dữ liệu, phân quyền, biểu mẫu và luồng vận hành",
-    "kpi": "100% master data + ma trận quyền",
+    "goal": "Dữ liệu, phân quyền, biểu mẫu, luồng duyệt.",
     "progress": 55,
     "status": "Đang làm"
   },
   {
     "name": "IT Policy Program",
-    "goal": "01 quy định chung + 06 phụ lục CNTT",
-    "kpi": "Ban hành trước 02/2026",
+    "goal": "01 quy định chung + 06 phụ lục CNTT.",
     "progress": 35,
     "status": "Cần đẩy"
   },
   {
     "name": "M365 Governance",
-    "goal": "Quản trị email, Teams, SharePoint, OneDrive, MFA",
-    "kpi": "Checklist quản trị + phân quyền",
+    "goal": "Email, Teams, SharePoint, OneDrive, MFA.",
     "progress": 48,
     "status": "Đang làm"
   },
   {
     "name": "Network & Security",
-    "goal": "Sơ đồ mạng, firewall, backup, VLAN, camera",
-    "kpi": "01 topology + 01 checklist vận hành",
+    "goal": "Topology, firewall, backup, VLAN, camera.",
     "progress": 50,
     "status": "Đang làm"
   },
   {
     "name": "PBOS Website",
-    "goal": "Dashboard cá nhân + portfolio công khai",
-    "kpi": "v1.1 deploy GitHub Pages",
-    "progress": 40,
-    "status": "Đang làm"
+    "goal": "Command Center + Career Capital.",
+    "progress": 55,
+    "status": "v1.2"
   },
   {
     "name": "IT Master Database",
-    "goal": "Tập trung tài sản, dịch vụ, tài khoản, hợp đồng, sự cố",
-    "kpi": "01 Excel/SharePoint master hoàn chỉnh",
+    "goal": "Tài sản, dịch vụ, tài khoản, hợp đồng, sự cố.",
     "progress": 40,
     "status": "Đang làm"
   }

@@ -3,25 +3,25 @@
     {
       "name": "ITIL Foundation",
       "priority": "Ưu tiên 1",
-      "target": "Hoàn thành nền tảng IT Service Management",
+      "target": "Nền tảng IT Service Management.",
       "progress": 30
     },
     {
       "name": "CCNA Basics",
       "priority": "Ưu tiên 2",
-      "target": "Nắm network core cho vận hành hạ tầng",
+      "target": "Network core cho vận hành hạ tầng.",
       "progress": 20
     },
     {
-      "name": "Security+ / ISO 27001 Awareness",
+      "name": "Security+ / ISO 27001",
       "priority": "Ưu tiên 3",
-      "target": "Tăng năng lực bảo mật và tuân thủ",
+      "target": "Bảo mật và tuân thủ.",
       "progress": 15
     },
     {
-      "name": "Power BI / Dashboard",
+      "name": "Power BI",
       "priority": "Ưu tiên 4",
-      "target": "Biến báo cáo thành KPI dashboard",
+      "target": "Báo cáo thành dashboard.",
       "progress": 45
     }
   ],
@@ -29,17 +29,11 @@
     "IT Governance",
     "ERP/FBO",
     "Microsoft 365",
-    "SharePoint",
     "Network",
-    "Firewall",
-    "Backup",
     "Security",
     "Power BI",
-    "Excel Master",
     "Documentation",
     "Process Design",
-    "Project Coordination",
-    "Content System",
-    "Personal Branding"
+    "Content System"
   ]
 }

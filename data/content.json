@@ -1,32 +1,17 @@
 [
   {
     "pillar": "System & IT Governance",
-    "angle": "Quy định CNTT, phân quyền, bảo mật, vận hành hệ thống doanh nghiệp nhỏ và vừa.",
+    "angle": "Quy định CNTT, phân quyền, bảo mật, vận hành.",
     "output": "4 bài/tháng"
   },
   {
     "pillar": "Automation & BI",
-    "angle": "Excel Master, SharePoint List, dashboard, workflow, quản lý bằng dữ liệu.",
+    "angle": "Excel Master, SharePoint, dashboard, workflow.",
     "output": "3 bài/tháng"
   },
   {
     "pillar": "ERP / FBO",
-    "angle": "Chuẩn hóa master data, luồng duyệt, ma trận quyền, triển khai ERP thực tế.",
+    "angle": "Master data, luồng duyệt, ma trận quyền.",
     "output": "3 bài/tháng"
-  },
-  {
-    "pillar": "Digital Transformation",
-    "angle": "Chuyển đổi số không phải khẩu hiệu, mà là chuẩn hóa quy trình và dữ liệu.",
-    "output": "2 bài/tháng"
-  },
-  {
-    "pillar": "AI & Carbon",
-    "angle": "AIoT, môi trường, carbon xanh, ứng dụng AI trong nghiên cứu và quản trị.",
-    "output": "2 bài/tháng"
-  },
-  {
-    "pillar": "Leadership & Career",
-    "angle": "Kỷ luật nghề nghiệp, học chứng chỉ, xây dựng năng lực có bằng chứng.",
-    "output": "2 bài/tháng"
   }
 ]

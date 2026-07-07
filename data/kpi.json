@@ -1,22 +1,22 @@
 {
-  "executionScore": 74,
-  "note": "Điểm mẫu v1.1. Cập nhật mỗi thứ Sáu trong data/kpi.json.",
+  "executionScore": 76,
+  "note": "Điểm mẫu. Cập nhật mỗi thứ Sáu.",
   "metrics": [
     {
+      "value": "76",
+      "label": "Execution Score"
+    },
+    {
+      "value": "5",
+      "label": "Career Achievements"
+    },
+    {
       "value": "6",
-      "label": "Dự án trọng điểm đang theo dõi"
-    },
-    {
-      "value": "2/3",
-      "label": "Bài viết thương hiệu cá nhân mỗi tuần"
-    },
-    {
-      "value": "45%",
-      "label": "Tiến độ chứng chỉ 6 tháng"
+      "label": "Active Projects"
     },
     {
       "value": "12",
-      "label": "Portfolio assets mục tiêu"
+      "label": "Portfolio Target"
     }
   ]
 }

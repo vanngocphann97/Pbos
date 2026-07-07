@@ -1,5 +1,23 @@
-# PBOS — Personal Brand Operating System
+# PBOS v1.2 — Career Capital
 
-Version: v1.1 Command Center.
+Bản này tối giản giao diện và bổ sung module thành tích.
 
-Upload all files to repository root. Update data in /data JSON files.
+## File cần upload lên GitHub
+
+- index.html
+- assets/css/style.css
+- assets/js/app.js
+- data/*.json
+- docs/*
+
+## Module mới
+
+- Career Capital
+- Achievements
+- Awards Summary
+
+## Cách cập nhật thành tích
+
+Sửa file:
+
+`data/achievements.json`
