@@ -1,0 +1,89 @@
+{
+  "focus": [
+    {
+      "type": "Focus 01",
+      "title": "IT Policy Program",
+      "note": "Chốt khung 01 quy định chung + 06 phụ lục."
+    },
+    {
+      "type": "Focus 02",
+      "title": "FBO Governance",
+      "note": "Hoàn thiện dữ liệu, ma trận phân quyền và biểu mẫu."
+    },
+    {
+      "type": "Focus 03",
+      "title": "PBOS v1.1",
+      "note": "Upload bản mới, kiểm tra Pages, bắt đầu dùng hằng ngày."
+    }
+  ],
+  "currentFocus": {
+    "title": "Chuẩn hóa hệ thống trước khi mở rộng",
+    "note": "Không thêm công cụ mới nếu dữ liệu, folder, dashboard và quy trình chưa rõ."
+  },
+  "mainRisk": {
+    "title": "Làm quá nhiều việc nhưng thiếu output đóng gói",
+    "note": "Mỗi tuần phải có ít nhất 01 tài sản rõ: báo cáo, checklist, dashboard, case study hoặc bài viết."
+  },
+  "nextOutput": {
+    "title": "PBOS chạy ổn trên GitHub Pages",
+    "note": "Sau đó mới nâng cấp giao diện, biểu đồ và dữ liệu động."
+  },
+  "principles": [
+    {
+      "title": "Output First",
+      "note": "Mỗi việc phải kết thúc bằng một tài sản cụ thể."
+    },
+    {
+      "title": "System Before Motivation",
+      "note": "Kỷ luật được thiết kế bằng dashboard, lịch và checklist."
+    },
+    {
+      "title": "One Source of Truth",
+      "note": "Dữ liệu chính nằm trong data, không ghi rải rác trong HTML."
+    },
+    {
+      "title": "Build in Public, Filter in Public",
+      "note": "Nội bộ ghi đầy đủ, công khai chỉ đưa phần đã chắt lọc."
+    }
+  ],
+  "weeklyRhythm": [
+    {
+      "day": "Thứ 2",
+      "action": "Review tuần · họp TGĐ · xác định 3 output"
+    },
+    {
+      "day": "Thứ 4",
+      "action": "Ban CNTT · xử lý dự án hệ thống · tháo blocking"
+    },
+    {
+      "day": "Thứ 6",
+      "action": "Cập nhật KPI · chốt báo cáo · archive hồ sơ"
+    },
+    {
+      "day": "Cuối tuần",
+      "action": "Học chứng chỉ · viết case study · nâng cấp PBOS"
+    }
+  ],
+  "weeklyReview": [
+    {
+      "title": "01. KPI tuần",
+      "note": "Cập nhật điểm thực thi, số bài viết, tiến độ học, số output."
+    },
+    {
+      "title": "02. Project progress",
+      "note": "Mỗi dự án cập nhật % và trạng thái."
+    },
+    {
+      "title": "03. Learning block",
+      "note": "Ghi rõ đã học gì, có áp dụng vào việc nào không."
+    },
+    {
+      "title": "04. Content asset",
+      "note": "Ít nhất 01 ý tưởng hoặc 01 bài nháp từ công việc thật."
+    },
+    {
+      "title": "05. Portfolio asset",
+      "note": "Đóng gói output tốt thành case study hoặc checklist."
+    }
+  ]
+}

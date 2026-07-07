@@ -1,6 +1,6 @@
 {
-  "executionScore": 72,
-  "note": "Điểm mẫu. Cập nhật mỗi cuối tuần trong data/kpi.json.",
+  "executionScore": 74,
+  "note": "Điểm mẫu v1.1. Cập nhật mỗi thứ Sáu trong data/kpi.json.",
   "metrics": [
     {
       "value": "6",
