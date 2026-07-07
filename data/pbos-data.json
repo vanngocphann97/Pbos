@@ -1,11 +1,11 @@
 {
   "meta": {
-    "version": "3.0",
+    "version": "3.1",
     "owner": "Phan Van Ngoc",
     "title": "PBOS",
-    "subtitle": "Daily Operating System",
+    "subtitle": "Workflow Engine",
     "northStar": "Build systems. Create value. Inspire people.",
-    "principle": "Think in systems. Build systems. Create value. Inspire people.",
+    "principle": "Every input must become a decision. Every output must become an asset.",
     "mode": "Public"
   },
   "daily": {
@@ -28,23 +28,111 @@
         "status": "Doing"
       },
       {
-        "title": "PBOS",
-        "why": "Ổn định Daily OS",
+        "title": "PBOS Workflow",
+        "why": "Ổn định cách vận hành",
         "status": "Build"
       }
     ],
     "nextActions": [
-      "Chốt 01 output rõ trước 17:00",
-      "Cập nhật tiến độ Project",
-      "Đóng gói output tốt thành Portfolio"
+      "Capture mọi ý tưởng vào Inbox",
+      "Chọn 3 việc đủ tạo output hôm nay",
+      "Cuối ngày quyết định: Archive hay Portfolio"
     ]
   },
+  "workflow": {
+    "engine": [
+      {
+        "step": "01 Capture",
+        "question": "Thông tin này có đáng giữ không?",
+        "action": "Đưa vào Inbox",
+        "output": "Inbox item"
+      },
+      {
+        "step": "02 Decide",
+        "question": "Nó thuộc Project, Learning, Content, Portfolio hay Archive?",
+        "action": "Phân loại",
+        "output": "Route"
+      },
+      {
+        "step": "03 Execute",
+        "question": "Việc nào tạo output rõ nhất?",
+        "action": "Đưa vào Today / Project",
+        "output": "Done item"
+      },
+      {
+        "step": "04 Review",
+        "question": "Tuần này tạo được gì?",
+        "action": "Review tuần",
+        "output": "Learning / KPI"
+      },
+      {
+        "step": "05 Convert",
+        "question": "Output này có thể thành tài sản sự nghiệp không?",
+        "action": "Đưa vào Portfolio",
+        "output": "Career asset"
+      }
+    ],
+    "routes": [
+      {
+        "route": "Project",
+        "when": "Có deadline, nhiều bước, tạo giá trị công việc",
+        "example": "IT Policy, FBO, M365"
+      },
+      {
+        "route": "Learning",
+        "when": "Tăng kỹ năng hoặc chứng chỉ",
+        "example": "ITIL, CCNA, Power BI"
+      },
+      {
+        "route": "Content",
+        "when": "Có thể viết thành bài chia sẻ",
+        "example": "Bài LinkedIn về IT Governance"
+      },
+      {
+        "route": "Portfolio",
+        "when": "Có output có thể chứng minh năng lực",
+        "example": "Dashboard, checklist, case study"
+      },
+      {
+        "route": "Archive",
+        "when": "Không còn giá trị hành động",
+        "example": "Ý tưởng cũ, việc không ưu tiên"
+      }
+    ],
+    "rules": [
+      "Không nhập thẳng vào Project nếu chưa qua Inbox.",
+      "Không đưa vào Today quá 3 Focus.",
+      "Không kết thúc tuần nếu chưa Review.",
+      "Không để output tốt nằm chết trong thư mục.",
+      "Không public dữ liệu mật lên GitHub."
+    ]
+  },
+  "inbox": [
+    {
+      "item": "Học CCNA",
+      "type": "Learning",
+      "route": "Learning",
+      "status": "Open"
+    },
+    {
+      "item": "Viết bài về IT Governance",
+      "type": "Content",
+      "route": "Content",
+      "status": "Open"
+    },
+    {
+      "item": "Chuẩn hóa IT Policy",
+      "type": "Project",
+      "route": "Project",
+      "status": "Doing"
+    }
+  ],
   "projects": [
     {
       "name": "PBOS",
-      "progress": 78,
+      "progress": 82,
       "risk": "Low",
-      "next": "Deploy v3.0 Daily OS",
+      "next": "Deploy Workflow Engine",
       "status": "Active"
     },
     {
@@ -195,7 +283,7 @@
     {
       "name": "PBOS",
       "type": "Product",
-      "status": "v3.0"
+      "status": "v3.1"
     }
   ],
   "review": {
@@ -203,13 +291,7 @@
       "Tuần này tạo được output nào?",
       "Dự án nào đang lệch?",
       "Năng lực nào tăng lên?",
-      "Có tài sản nào đưa vào Portfolio không?"
-    ],
-    "rules": [
-      "Không học lan man.",
-      "Không làm việc rời rạc.",
-      "Không đưa dữ liệu mật lên GitHub Public.",
-      "Mỗi tuần có ít nhất 01 tài sản rõ."
+      "Output nào chuyển thành Portfolio?"
     ]
   }
 }

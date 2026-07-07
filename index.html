@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>PBOS v3.0 | Phan Van Ngoc</title>
+  <title>PBOS v3.1 | Phan Van Ngoc</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
@@ -11,13 +11,12 @@
   <aside class="rail">
     <div class="brand">
       <div class="logo">PB</div>
-      <div>
-        <h1>PBOS</h1>
-        <p id="versionText">Daily OS</p>
-      </div>
+      <div><h1>PBOS</h1><p id="versionText">Workflow Engine</p></div>
     </div>
     <nav>
       <a href="#today" class="active">Today</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#inbox">Inbox</a>
       <a href="#projects">Projects</a>
       <a href="#career">Career</a>
       <a href="#knowledge">Knowledge</a>
@@ -26,8 +25,8 @@
       <a href="admin.html">Admin</a>
     </nav>
     <div class="rule">
-      <span>Core</span>
-      <strong>Look. Decide. Execute. Review.</strong>
+      <span>Operating Law</span>
+      <strong>Input → Decision → Output → Asset</strong>
     </div>
   </aside>
 
@@ -37,7 +36,6 @@
         <div class="eyebrow">Daily Command</div>
         <h2 id="greeting">Good Morning, Ngoc</h2>
         <p id="dateNow" class="muted"></p>
-
         <div class="north">
           <span>North Star</span>
           <strong id="northStar"></strong>
@@ -46,19 +44,9 @@
       </div>
 
       <div class="daily-right">
-        <div class="score-card primary">
-          <span>Operating Score</span>
-          <strong id="operatingScore">--</strong>
-        </div>
-        <div class="score-card">
-          <span>This Week</span>
-          <strong id="weekOutput">--</strong>
-        </div>
-        <div class="score-card wide">
-          <span>Today's Output</span>
-          <strong id="todayOutput">--</strong>
-          <p id="deadline"></p>
-        </div>
+        <div class="score-card primary"><span>Operating Score</span><strong id="operatingScore">--</strong></div>
+        <div class="score-card"><span>This Week</span><strong id="weekOutput">--</strong></div>
+        <div class="score-card wide"><span>Today's Output</span><strong id="todayOutput">--</strong><p id="deadline"></p></div>
       </div>
     </section>
 
@@ -73,6 +61,22 @@
       </div>
     </section>
 
+    <section id="workflow" class="panel">
+      <div class="section-title"><h3>Workflow Engine</h3><p>xương sống vận hành PBOS</p></div>
+      <div id="workflowGrid" class="workflow-grid"></div>
+    </section>
+
+    <section id="inbox" class="board">
+      <div class="panel">
+        <div class="section-title"><h3>Inbox</h3><p>mọi thứ vào đây trước</p></div>
+        <div id="inboxList" class="list"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><h3>Decision Routes</h3><p>phân loại rõ trước khi làm</p></div>
+        <div id="routeList" class="route-grid"></div>
+      </div>
+    </section>
+
     <section id="projects" class="panel">
       <div class="section-title"><h3>Projects</h3><p>tiến độ · rủi ro · hành động kế tiếp</p></div>
       <div id="projectGrid" class="project-grid"></div>
@@ -81,10 +85,7 @@
     <section id="career" class="panel">
       <div class="section-title"><h3>Career Capital</h3><p id="careerRole"></p></div>
       <div id="careerGrid" class="metric-grid"></div>
-      <table>
-        <thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead>
-        <tbody id="achievementRows"></tbody>
-      </table>
+      <table><thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead><tbody id="achievementRows"></tbody></table>
     </section>
 
     <section id="knowledge" class="panel">
@@ -93,7 +94,7 @@
     </section>
 
     <section id="portfolio" class="panel">
-      <div class="section-title"><h3>Portfolio</h3><p>tài sản công khai, không phải việc đã làm xong</p></div>
+      <div class="section-title"><h3>Portfolio</h3><p>output chuyển thành tài sản</p></div>
       <div id="portfolioGrid" class="asset-grid"></div>
     </section>
 
@@ -103,12 +104,12 @@
         <div id="questionList" class="list"></div>
       </div>
       <div class="panel">
-        <div class="section-title"><h3>Rules</h3><p>luật vận hành</p></div>
+        <div class="section-title"><h3>Rules</h3><p>luật không thương lượng</p></div>
         <div id="ruleList" class="list"></div>
       </div>
     </section>
 
-    <footer>PBOS v3.0 · Daily Operating System · Phan Van Ngoc</footer>
+    <footer>PBOS v3.1 · Workflow Engine · Phan Van Ngoc</footer>
   </main>
 </div>
 <script src="assets/js/app.js"></script>
