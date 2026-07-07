@@ -1,10 +1,11 @@
 {
   "meta": {
-    "version": "2.1",
+    "version": "2.2",
     "owner": "Phan Van Ngoc",
     "title": "PBOS",
-    "subtitle": "Compact Operating System",
+    "subtitle": "Personal Brand Operating System",
     "northStar": "Build systems. Create value. Inspire people.",
+    "principle": "System first. Output measured. Career compounded.",
     "mode": "Public"
   },
   "today": {
@@ -15,89 +16,95 @@
         "status": "Focus"
       },
       {
-        "title": "FBO Review",
-        "type": "ERP",
+        "title": "FBO / ERP",
+        "type": "Automation",
         "status": "Doing"
       },
       {
-        "title": "PBOS v2.1",
+        "title": "PBOS",
         "type": "Product",
         "status": "Build"
       }
     ],
     "nextActions": [
-      "Rà soát dữ liệu public trước khi upload GitHub",
-      "Cập nhật Career Capital",
-      "Chốt 01 output rõ trong ngày"
+      "Chốt 01 output rõ trong ngày",
+      "Cập nhật tiến độ Project",
+      "Biến kết quả tốt thành Portfolio"
     ]
   },
   "scores": [
     {
       "name": "Execution",
-      "value": 82
+      "value": 82,
+      "note": "Kỷ luật thực thi"
     },
     {
       "name": "Career",
-      "value": 87
+      "value": 87,
+      "note": "Vốn sự nghiệp"
     },
     {
       "name": "Learning",
-      "value": 45
-    },
-    {
-      "name": "Brand",
-      "value": 38
+      "value": 45,
+      "note": "Năng lực mới"
     },
     {
       "name": "Portfolio",
-      "value": 34
+      "value": 34,
+      "note": "Tài sản công khai"
+    },
+    {
+      "name": "Brand",
+      "value": 38,
+      "note": "Hiện diện chuyên môn"
     },
     {
       "name": "Readiness",
-      "value": 58
+      "value": 58,
+      "note": "Sẵn sàng thăng tiến"
     }
   ],
   "projects": [
     {
       "name": "PBOS",
-      "progress": 68,
+      "progress": 72,
       "priority": "High",
-      "next": "Deploy v2.1",
+      "next": "Ổn định Guiding OS",
       "status": "Active"
     },
     {
       "name": "FBO / ERP",
       "progress": 55,
       "priority": "High",
-      "next": "Review permission matrix",
+      "next": "Rà soát ma trận phân quyền",
       "status": "Active"
     },
     {
       "name": "IT Policy",
       "progress": 35,
       "priority": "High",
-      "next": "Complete appendix structure",
+      "next": "Hoàn thiện phụ lục",
       "status": "Risk"
     },
     {
-      "name": "M365",
+      "name": "M365 Governance",
       "progress": 48,
       "priority": "Medium",
-      "next": "Review SharePoint permission",
+      "next": "Rà soát SharePoint/MFA",
       "status": "Active"
     },
     {
-      "name": "Network",
+      "name": "Network & Security",
       "progress": 50,
       "priority": "Medium",
-      "next": "Update topology",
+      "next": "Cập nhật topology",
       "status": "Active"
     },
     {
       "name": "IT Master",
       "progress": 40,
       "priority": "Medium",
-      "next": "Clean master data",
+      "next": "Chuẩn hóa master data",
       "status": "Active"
     }
   ],
@@ -162,39 +169,26 @@
     {
       "name": "ITIL Foundation",
       "progress": 30,
-      "priority": "P1"
+      "priority": "P1",
+      "why": "IT Service Management"
     },
     {
       "name": "CCNA Basics",
       "progress": 20,
-      "priority": "P2"
+      "priority": "P2",
+      "why": "Network core"
     },
     {
       "name": "Security+ / ISO 27001",
       "progress": 15,
-      "priority": "P3"
+      "priority": "P3",
+      "why": "Security & compliance"
     },
     {
       "name": "Power BI",
       "progress": 45,
-      "priority": "P4"
-    }
-  ],
-  "content": [
-    {
-      "pillar": "System & IT Governance",
-      "target": "4 bài/tháng",
-      "status": "Active"
-    },
-    {
-      "pillar": "Automation & BI",
-      "target": "3 bài/tháng",
-      "status": "Active"
-    },
-    {
-      "pillar": "ERP / FBO",
-      "target": "3 bài/tháng",
-      "status": "Active"
+      "priority": "P4",
+      "why": "Dashboard & reporting"
     }
   ],
   "portfolio": [
@@ -212,7 +206,28 @@
       "name": "FBO Governance Case Study",
       "type": "Case Study",
       "status": "Collecting"
+    },
+    {
+      "name": "IT Policy Program",
+      "type": "Governance",
+      "status": "Building"
+    },
+    {
+      "name": "M365 Governance",
+      "type": "System",
+      "status": "Operating"
+    },
+    {
+      "name": "PBOS",
+      "type": "Product",
+      "status": "v2.2"
     }
+  ],
+  "operatingRules": [
+    "Không học lan man. Học theo JD, dự án và khoảng trống năng lực.",
+    "Không làm việc rời rạc. Mỗi output phải vào Projects hoặc Portfolio.",
+    "Không đưa dữ liệu mật lên GitHub Public.",
+    "Mỗi tuần phải có ít nhất 01 tài sản rõ: báo cáo, checklist, dashboard, case study hoặc bài viết."
   ],
   "settings": {
     "publicMode": true,

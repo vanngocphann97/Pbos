@@ -1,1 +1,31 @@
-const editor=document.getElementById("editor"),statusEl=document.getElementById("status");function status(t){statusEl.textContent=t}async function loadData(){try{const r=await fetch("data/pbos-data.json",{cache:"no-store"});const d=await r.json();editor.value=JSON.stringify(d,null,2);status("Loaded data/pbos-data.json")}catch(e){status("Load failed")}}function parse(){return JSON.parse(editor.value)}function format(){try{editor.value=JSON.stringify(parse(),null,2);status("Formatted")}catch(e){status("Invalid JSON")}}function validate(){try{parse();status("Valid JSON")}catch(e){status("Invalid JSON: "+e.message)}}function exp(){try{const d=parse();const blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="pbos-data.json";a.click();URL.revokeObjectURL(url);status("Exported pbos-data.json")}catch(e){status("Export failed")}}document.getElementById("loadData").onclick=loadData;document.getElementById("formatData").onclick=format;document.getElementById("validateData").onclick=validate;document.getElementById("exportData").onclick=exp;loadData();
+const editor=document.getElementById("editor"),statusEl=document.getElementById("status");
+function status(t){statusEl.textContent=t}
+async function loadData(){
+  try{
+    const r=await fetch("data/pbos-data.json",{cache:"no-store"});
+    const d=await r.json();
+    editor.value=JSON.stringify(d,null,2);
+    status("Loaded data/pbos-data.json");
+  }catch(e){status("Load failed")}
+}
+function parse(){return JSON.parse(editor.value)}
+function format(){try{editor.value=JSON.stringify(parse(),null,2);status("Formatted")}catch(e){status("Invalid JSON")}}
+function validate(){try{parse();status("Valid JSON")}catch(e){status("Invalid JSON: "+e.message)}}
+function exp(){
+  try{
+    const d=parse();
+    const blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download="pbos-data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    status("Exported pbos-data.json");
+  }catch(e){status("Export failed")}
+}
+document.getElementById("loadData").onclick=loadData;
+document.getElementById("formatData").onclick=format;
+document.getElementById("validateData").onclick=validate;
+document.getElementById("exportData").onclick=exp;
+loadData();

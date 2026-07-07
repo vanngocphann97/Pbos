@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>PBOS v2.1 | Phan Van Ngoc</title>
+  <title>PBOS v2.2 | Phan Van Ngoc</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
@@ -11,81 +11,118 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">PB</div>
-      <div><h1>PBOS</h1><p id="versionText">v2.1 Compact OS</p></div>
+      <div>
+        <h1>PBOS</h1>
+        <p id="versionText">Guiding OS</p>
+      </div>
     </div>
+
     <nav>
-      <a href="#today" class="active">Today</a>
+      <a href="#north" class="active">North Star</a>
+      <a href="#today">Today</a>
+      <a href="#scores">Scores</a>
       <a href="#projects">Projects</a>
       <a href="#career">Career</a>
       <a href="#learning">Learning</a>
-      <a href="#content">Content</a>
       <a href="#portfolio">Portfolio</a>
-      <a href="#settings">Settings</a>
       <a href="admin.html">Admin</a>
     </nav>
-    <div class="note">
-      <span>North Star</span>
-      <strong id="northStar"></strong>
+
+    <div class="side-card">
+      <span>Rule</span>
+      <strong>Look. Decide. Execute. Review.</strong>
     </div>
   </aside>
 
   <main>
-    <section id="today" class="hero">
-      <div class="hero-title">
+    <section id="north" class="hero">
+      <div>
+        <div class="eyebrow">North Star</div>
+        <h2 id="northStar"></h2>
+        <p id="principle" class="lead"></p>
+      </div>
+      <div class="today-mini">
         <div class="eyebrow">Today</div>
-        <h2 id="greeting">Good Morning, Ngoc</h2>
+        <h3 id="greeting"></h3>
         <p id="dateNow" class="muted"></p>
       </div>
-      <div id="scoreStrip" class="score-strip"></div>
     </section>
 
-    <section class="split">
+    <section id="today" class="grid-2">
       <div class="panel">
-        <div class="section-title"><h3>Focus</h3><p>Top 3</p></div>
-        <div id="todayFocus" class="compact-grid"></div>
+        <div class="section-title">
+          <h3>Focus</h3>
+          <p>3 việc cần nhìn mỗi ngày</p>
+        </div>
+        <div id="todayFocus" class="cards-3"></div>
       </div>
+
       <div class="panel">
-        <div class="section-title"><h3>Next</h3><p>Action list</p></div>
+        <div class="section-title">
+          <h3>Next Actions</h3>
+          <p>Việc tiếp theo</p>
+        </div>
         <div id="nextActions" class="action-list"></div>
       </div>
     </section>
 
+    <section id="scores" class="panel">
+      <div class="section-title">
+        <h3>Scoreboard</h3>
+        <p>Đo để điều chỉnh, không đo để trang trí</p>
+      </div>
+      <div id="scoreStrip" class="score-grid"></div>
+    </section>
+
     <section id="projects" class="panel">
-      <div class="section-title"><h3>Projects</h3><p>Control board</p></div>
+      <div class="section-title">
+        <h3>Projects</h3>
+        <p>Chỉ giữ các dự án tạo năng lực hoặc tài sản</p>
+      </div>
       <div id="projectGrid" class="project-grid"></div>
     </section>
 
     <section id="career" class="panel">
-      <div class="section-title"><h3>Career Capital</h3><p id="careerRole"></p></div>
-      <div id="careerCapital" class="score-grid"></div>
-      <table>
-        <thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead>
-        <tbody id="achievementRows"></tbody>
-      </table>
+      <div class="section-title">
+        <h3>Career Capital</h3>
+        <p id="careerRole"></p>
+      </div>
+      <div id="careerCapital" class="score-grid compact"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Năm</th><th>Thành tích</th><th>Nguồn</th></tr></thead>
+          <tbody id="achievementRows"></tbody>
+        </table>
+      </div>
     </section>
 
     <section id="learning" class="panel">
-      <div class="section-title"><h3>Learning</h3><p>Skill progress</p></div>
+      <div class="section-title">
+        <h3>Learning Roadmap</h3>
+        <p>Học theo vai trò mục tiêu</p>
+      </div>
       <div id="learningGrid" class="project-grid"></div>
     </section>
 
-    <section class="split">
-      <div id="content" class="panel">
-        <div class="section-title"><h3>Content</h3><p>Pillars</p></div>
-        <div id="contentGrid" class="compact-grid one"></div>
+    <section id="portfolio" class="grid-2">
+      <div class="panel">
+        <div class="section-title">
+          <h3>Portfolio</h3>
+          <p>Tài sản công khai</p>
+        </div>
+        <div id="portfolioGrid" class="cards-3 two"></div>
       </div>
-      <div id="portfolio" class="panel">
-        <div class="section-title"><h3>Portfolio</h3><p>Assets</p></div>
-        <div id="portfolioGrid" class="compact-grid one"></div>
+
+      <div class="panel">
+        <div class="section-title">
+          <h3>Operating Rules</h3>
+          <p>Luật vận hành PBOS</p>
+        </div>
+        <div id="rules" class="action-list"></div>
       </div>
     </section>
 
-    <section id="settings" class="panel">
-      <div class="section-title"><h3>Settings</h3><p>Public operations</p></div>
-      <div id="settingsGrid" class="compact-grid"></div>
-    </section>
-
-    <footer>PBOS v2.1 · Compact Operating System · Phan Van Ngoc</footer>
+    <footer>PBOS v2.2 · Guiding Operating System · Phan Van Ngoc</footer>
   </main>
 </div>
 <script src="assets/js/app.js"></script>

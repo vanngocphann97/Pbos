@@ -1,5 +1,8 @@
-# PBOS v2.1 Guide
+# PBOS v2.2 Guide
 
-Mục tiêu: gọn hơn v2.0, ít chữ, dễ nhìn nhanh.
-
-Cập nhật dữ liệu tại `admin.html`, export `pbos-data.json`, upload vào `data/pbos-data.json`.
+Mục tiêu: mỗi ngày mở PBOS và biết ngay:
+1. Hướng đi dài hạn.
+2. 3 việc trọng tâm.
+3. Dự án nào đang lệch.
+4. Năng lực nào cần bổ sung.
+5. Output nào phải chuyển thành portfolio.
