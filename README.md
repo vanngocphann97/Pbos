@@ -1,6 +1,15 @@
-# PBOS v2.2 — Guiding OS
+# PBOS v3.0 — Daily OS
 
-Bản này tối ưu để làm kim chỉ nam 5–10 năm: sáng hơn, gọn hơn, giảm nhiễu, tập trung vào North Star, Today, Scores, Projects, Career, Learning và Portfolio.
+PBOS v3.0 được thiết kế để dùng thật mỗi ngày.
+
+## Triết lý
+
+Mở lên là biết:
+1. Hôm nay cần làm gì.
+2. Tuần này thiếu output nào.
+3. Dự án nào đang lệch.
+4. Career Capital đang tích lũy ra sao.
+5. Output nào cần đưa vào Portfolio.
 
 ## Deploy
 

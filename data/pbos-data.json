@@ -1,110 +1,85 @@
 {
   "meta": {
-    "version": "2.2",
+    "version": "3.0",
     "owner": "Phan Van Ngoc",
     "title": "PBOS",
-    "subtitle": "Personal Brand Operating System",
+    "subtitle": "Daily Operating System",
     "northStar": "Build systems. Create value. Inspire people.",
-    "principle": "System first. Output measured. Career compounded.",
+    "principle": "Think in systems. Build systems. Create value. Inspire people.",
     "mode": "Public"
   },
-  "today": {
+  "daily": {
+    "operatingScore": 82,
+    "weekOutput": {
+      "done": 4,
+      "target": 7
+    },
+    "todayOutput": "IT Policy Draft v1",
+    "deadline": "17:00",
     "focus": [
       {
         "title": "IT Policy",
-        "type": "System",
+        "why": "Chuẩn hóa quản trị CNTT",
         "status": "Focus"
       },
       {
         "title": "FBO / ERP",
-        "type": "Automation",
+        "why": "Rà soát phân quyền",
         "status": "Doing"
       },
       {
         "title": "PBOS",
-        "type": "Product",
+        "why": "Ổn định Daily OS",
         "status": "Build"
       }
     ],
     "nextActions": [
-      "Chốt 01 output rõ trong ngày",
+      "Chốt 01 output rõ trước 17:00",
       "Cập nhật tiến độ Project",
-      "Biến kết quả tốt thành Portfolio"
+      "Đóng gói output tốt thành Portfolio"
     ]
   },
-  "scores": [
-    {
-      "name": "Execution",
-      "value": 82,
-      "note": "Kỷ luật thực thi"
-    },
-    {
-      "name": "Career",
-      "value": 87,
-      "note": "Vốn sự nghiệp"
-    },
-    {
-      "name": "Learning",
-      "value": 45,
-      "note": "Năng lực mới"
-    },
-    {
-      "name": "Portfolio",
-      "value": 34,
-      "note": "Tài sản công khai"
-    },
-    {
-      "name": "Brand",
-      "value": 38,
-      "note": "Hiện diện chuyên môn"
-    },
-    {
-      "name": "Readiness",
-      "value": 58,
-      "note": "Sẵn sàng thăng tiến"
-    }
-  ],
   "projects": [
     {
       "name": "PBOS",
-      "progress": 72,
-      "priority": "High",
-      "next": "Ổn định Guiding OS",
+      "progress": 78,
+      "risk": "Low",
+      "next": "Deploy v3.0 Daily OS",
       "status": "Active"
     },
     {
       "name": "FBO / ERP",
       "progress": 55,
-      "priority": "High",
-      "next": "Rà soát ma trận phân quyền",
+      "risk": "Medium",
+      "next": "Review permission matrix",
       "status": "Active"
     },
     {
       "name": "IT Policy",
       "progress": 35,
-      "priority": "High",
-      "next": "Hoàn thiện phụ lục",
+      "risk": "High",
+      "next": "Complete appendix structure",
       "status": "Risk"
     },
     {
       "name": "M365 Governance",
       "progress": 48,
-      "priority": "Medium",
-      "next": "Rà soát SharePoint/MFA",
+      "risk": "Medium",
+      "next": "Review SharePoint / MFA",
       "status": "Active"
     },
     {
       "name": "Network & Security",
       "progress": 50,
-      "priority": "Medium",
-      "next": "Cập nhật topology",
+      "risk": "Medium",
+      "next": "Update topology",
       "status": "Active"
     },
     {
       "name": "IT Master",
       "progress": 40,
-      "priority": "Medium",
-      "next": "Chuẩn hóa master data",
+      "risk": "Medium",
+      "next": "Clean master data",
       "status": "Active"
     }
   ],
@@ -125,16 +100,16 @@
         "value": 3
       },
       {
+        "name": "Public Assets",
+        "value": 6
+      },
+      {
         "name": "Career Score",
         "value": 87
       },
       {
-        "name": "Promotion Readiness",
+        "name": "Readiness",
         "value": 58
-      },
-      {
-        "name": "Public Assets",
-        "value": 6
       }
     ],
     "achievements": [
@@ -165,30 +140,30 @@
       }
     ]
   },
-  "learning": [
+  "knowledge": [
     {
       "name": "ITIL Foundation",
       "progress": 30,
-      "priority": "P1",
-      "why": "IT Service Management"
+      "type": "ITSM",
+      "priority": "P1"
     },
     {
       "name": "CCNA Basics",
       "progress": 20,
-      "priority": "P2",
-      "why": "Network core"
+      "type": "Network",
+      "priority": "P2"
     },
     {
       "name": "Security+ / ISO 27001",
       "progress": 15,
-      "priority": "P3",
-      "why": "Security & compliance"
+      "type": "Security",
+      "priority": "P3"
     },
     {
       "name": "Power BI",
       "progress": 45,
-      "priority": "P4",
-      "why": "Dashboard & reporting"
+      "type": "BI / Dashboard",
+      "priority": "P4"
     }
   ],
   "portfolio": [
@@ -220,19 +195,21 @@
     {
       "name": "PBOS",
       "type": "Product",
-      "status": "v2.2"
+      "status": "v3.0"
     }
   ],
-  "operatingRules": [
-    "Không học lan man. Học theo JD, dự án và khoảng trống năng lực.",
-    "Không làm việc rời rạc. Mỗi output phải vào Projects hoặc Portfolio.",
-    "Không đưa dữ liệu mật lên GitHub Public.",
-    "Mỗi tuần phải có ít nhất 01 tài sản rõ: báo cáo, checklist, dashboard, case study hoặc bài viết."
-  ],
-  "settings": {
-    "publicMode": true,
-    "dataFile": "data/pbos-data.json",
-    "repository": "vanngocphann97/Pbos",
-    "website": "https://vanngocphann97.github.io/Pbos/"
+  "review": {
+    "weeklyQuestions": [
+      "Tuần này tạo được output nào?",
+      "Dự án nào đang lệch?",
+      "Năng lực nào tăng lên?",
+      "Có tài sản nào đưa vào Portfolio không?"
+    ],
+    "rules": [
+      "Không học lan man.",
+      "Không làm việc rời rạc.",
+      "Không đưa dữ liệu mật lên GitHub Public.",
+      "Mỗi tuần có ít nhất 01 tài sản rõ."
+    ]
   }
 }
