@@ -1,0 +1,22 @@
+{
+  "executionScore": 72,
+  "note": "Điểm mẫu. Cập nhật mỗi cuối tuần trong data/kpi.json.",
+  "metrics": [
+    {
+      "value": "6",
+      "label": "Dự án trọng điểm đang theo dõi"
+    },
+    {
+      "value": "2/3",
+      "label": "Bài viết thương hiệu cá nhân mỗi tuần"
+    },
+    {
+      "value": "45%",
+      "label": "Tiến độ chứng chỉ 6 tháng"
+    },
+    {
+      "value": "12",
+      "label": "Portfolio assets mục tiêu"
+    }
+  ]
+}

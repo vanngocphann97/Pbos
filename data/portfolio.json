@@ -1,0 +1,32 @@
+[
+  {
+    "name": "IT Master System",
+    "description": "Bộ quản trị tài sản, dịch vụ, tài khoản, hợp đồng, backup và sự cố CNTT.",
+    "status": "Đang xây"
+  },
+  {
+    "name": "Network Topology",
+    "description": "Sơ đồ hạ tầng mạng, VLAN, firewall, NAS, server, camera và VoIP.",
+    "status": "Đang chuẩn hóa"
+  },
+  {
+    "name": "FBO Governance Case Study",
+    "description": "Case study triển khai ERP/FBO: master data, phân quyền, quy trình duyệt.",
+    "status": "Đang thu thập"
+  },
+  {
+    "name": "IT Policy Program",
+    "description": "01 quy định chung và 06 phụ lục quản trị CNTT.",
+    "status": "Đang soạn"
+  },
+  {
+    "name": "M365 Governance",
+    "description": "Cấu trúc quản trị Microsoft 365, SharePoint, Teams, OneDrive, MFA.",
+    "status": "Đang vận hành"
+  },
+  {
+    "name": "Personal Brand OS",
+    "description": "Hệ thống điều hành thương hiệu cá nhân và sự nghiệp 10 năm.",
+    "status": "v1"
+  }
+]
