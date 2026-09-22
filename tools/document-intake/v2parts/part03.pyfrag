@@ -1,0 +1,118 @@
+        s=self.engine.stats_today();self.stats.set(f"Hôm nay  AUTO {s['AUTO']}   DUYỆT {s['MANUAL']}   REVIEW {len(self.rows)}   LỖI {s['ERROR']}   TRÙNG {s['DUPLICATE']}")
+
+    def pick(self,event=None):
+        sel=self.tree.selection()
+        if not sel:return
+        p=self.rows[sel[0]];self.current=p;d=self.engine.lookup(p)
+        for k,v in self.vars.items():v.set(d.get(k,''))
+        self.conf.set(f"Confidence {d.get('confidence',0)}% • {d.get('stage','')} • {d.get('elapsed','?')}s")
+        self.render_preview(p)
+
+    def update_proposed(self):
+        if hasattr(self,'filename'):
+            self.filename.set(proposed({k:v.get() for k,v in self.vars.items()},int(self.engine.cfg.get('summary_words',8))))
+
+    def render_preview(self,p):
+        def work():
+            try:
+                with fitz.open(p) as doc:
+                    page=doc[0]; pix=page.get_pixmap(matrix=fitz.Matrix(1.0,1.0),colorspace=fitz.csRGB,alpha=False)
+                    img=Image.frombytes('RGB',[pix.width,pix.height],pix.samples); img.thumbnail((430,430))
+                    self.after(0,lambda:self._show_img(img))
+            except Exception: pass
+        threading.Thread(target=work,daemon=True).start()
+
+    def _show_img(self,img):
+        self.photo=ImageTk.PhotoImage(img);self.canvas.delete('all');self.canvas.create_image(5,5,anchor='nw',image=self.photo)
+
+    def approve(self):
+        if not self.current:return
+        try:
+            dst=self.engine.approve_review(self.current,{k:v.get().strip() for k,v in self.vars.items()})
+            self.current=None;self.refresh();self.status.set('Đã hoàn tất: '+dst.name)
+            kids=self.tree.get_children()
+            if kids:self.tree.selection_set(kids[0]);self.tree.focus(kids[0]);self.pick()
+        except Exception as exc: messagebox.showerror('Không thể duyệt',str(exc),parent=self)
+
+    def open_pdf(self):
+        if self.current: os.startfile(self.current)
+
+    def undo(self):
+        p=self.engine.undo_last();self.refresh();self.status.set('Đã hoàn tác về Review.' if p else 'Không có file để hoàn tác.')
+
+    def poll(self):
+        changed=False
+        try:
+            while True:
+                kind,p,d=self.engine.events.get_nowait();changed=True
+                if d.get('status')=='REVIEW' and self.state()=='withdrawn':
+                    self.status.set('Có hồ sơ cần kiểm tra')
+        except queue.Empty:pass
+        if changed:self.refresh()
+        self.after(300,self.poll)
+
+
+# ---------- self test ----------
+def self_test_core():
+    import tempfile, traceback, io
+    report={'app_version':APP_VERSION,'checks':[],'passed':False}
+    def check(name,cond,detail=''):
+        ok=bool(cond);report['checks'].append({'name':name,'passed':ok,'detail':detail})
+        if not ok:raise AssertionError(name+(': '+detail if detail else ''))
+    old_cfg=dict(DEFAULT_CONFIG)
+    try:
+        check('date validation',valid_date('20260922') and not valid_date('20260230'))
+        m=metadata('CÔNG VĂN\nSố: 123/2026/CV-BTH\nTP. Hồ Chí Minh, ngày 22 tháng 9 năm 2026\nV/v: Triển khai kế hoạch chuyển đổi số năm 2026')
+        c,_=confidence(m,'text')
+        check('metadata',m['date']=='20260922' and m['number']=='123/2026/CV-BTH' and m['type']=='CV',str(m))
+        check('confidence',c>=92,str(c))
+        check('filename',proposed(m).startswith('20260922_123-2026-CV-BTH_CV_BTH_'),proposed(m))
+        with tempfile.TemporaryDirectory(prefix='di2-') as td:
+            cfg=dict(DEFAULT_CONFIG);cfg.update(workspace=td,auto_threshold=90,workers=1)
+            e=Engine(cfg=cfg,root=td); langs=e.check_runtime();check('ocr runtime','vie' in langs and 'eng' in langs)
+            # text PDF should avoid OCR and auto-complete
+            p=e.paths['INBOX']/'text.pdf';doc=fitz.open();page=doc.new_page();page.insert_text((72,72),'CONG VAN\nSo: 123/2026/CV-BTH\nTP. Ho Chi Minh, ngay 22 thang 9 nam 2026\nV/v: Trien khai ke hoach chuyen doi so nam 2026',fontsize=12);doc.save(p);doc.close()
+            d=e.fast_extract(p);check('fast text path',d['source']=='text' and d['elapsed']<3,str(d))
+            e.process_file(p);completed=list(e.paths['COMPLETED'].glob('*.pdf'));check('auto complete',len(completed)==1,str(completed))
+            # duplicate detection
+            dup=e.paths['INBOX']/'dup.pdf';shutil.copy2(completed[0],dup);e.process_file(dup);check('duplicate detection',len(list(e.paths['DUPLICATE'].glob('*.pdf')))==1)
+            # scanned PDF OCR path
+            img=Image.new('RGB',(1600,1000),'white');draw=ImageDraw.Draw(img);font=None
+            for f in ['C:/Windows/Fonts/arial.ttf','/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf']:
+                if Path(f).is_file():
+                    try:font=ImageFont.truetype(f,46);break
+                    except Exception:pass
+            font=font or ImageFont.load_default();y=80
+            for line in ['CONG VAN','So: 456/CV-BTH','TP. Ho Chi Minh, ngay 22 thang 9 nam 2026','V/v: Kiem thu OCR tu dong']:
+                draw.text((80,y),line,fill='black',font=font);y+=100
+            scan=e.paths['INBOX']/'scan.pdf';doc=fitz.open();page=doc.new_page(width=595,height=842);buf=io.BytesIO();img.save(buf,format='PNG');page.insert_image(page.rect,stream=buf.getvalue());doc.save(scan);doc.close()
+            od=e.fast_extract(scan);check('ocr path',od['source']=='ocr' and token(od.get('number'))=='456-CV-BTH',str(od))
+            e.stop()
+        report['passed']=True
+    except Exception:report['error']=traceback.format_exc()
+    target=APP_EXE_DIR/'SELF_TEST_RESULT.json'
+    try:target.write_text(json.dumps(report,ensure_ascii=False,indent=2),'utf-8')
+    except Exception:pass
+    return report
+
+
+def main():
+    try:
+        if '--self-test' in sys.argv:
+            r=self_test_core();print(json.dumps(r,ensure_ascii=False,indent=2));raise SystemExit(0 if r.get('passed') else 1)
+        cfg=load_config();save_config(cfg);set_startup(bool(cfg.get('startup')))
+        engine=Engine(cfg);engine.check_runtime();engine.start_watch();engine.scan_inbox()
+        app=App(engine)
+        if '--background' in sys.argv: app.withdraw()
+        app.mainloop();engine.stop()
+    except SystemExit:raise
+    except Exception:
+        import traceback
+        LOCAL_APP.mkdir(parents=True,exist_ok=True)
+        try:(LOCAL_APP/'startup_error.txt').write_text(traceback.format_exc(),'utf-8')
+        except Exception:pass
+        try:messagebox.showerror('Document Intake','Không thể khởi động. Xem startup_error.txt trong %LOCALAPPDATA%\\DocumentIntake')
+        except Exception:pass
+        sys.exit(1)
+
+if __name__=='__main__':main()
