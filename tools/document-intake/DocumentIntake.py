@@ -640,6 +640,8 @@ def self_test_core():
         report['passed']=True
     except Exception:
         report['error']=traceback.format_exc()
+        try: print(report['error'], file=sys.stderr, flush=True)
+        except Exception: pass
     target=APP_DIR/'SELF_TEST_RESULT.json'
     try: target.write_text(json.dumps(report,ensure_ascii=False,indent=2),'utf-8')
     except Exception: pass
