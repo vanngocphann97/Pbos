@@ -45,6 +45,7 @@ jobs:
         run: |
           python DocumentIntake.py --self-test
           $code=$LASTEXITCODE
+          $global:LASTEXITCODE=0
           if (Test-Path .\SELF_TEST_RESULT.json) { Get-Content .\SELF_TEST_RESULT.json }
           exit $code
 
