@@ -65,12 +65,11 @@ jobs:
         shell: pwsh
         working-directory: tools/document-intake
         run: |
-          Push-Location dist
-          .\DocumentIntake.exe --self-test
-          $code = $LASTEXITCODE
-          Pop-Location
+          $p = Start-Process -FilePath ".\dist\DocumentIntake.exe" -ArgumentList "--self-test" -WorkingDirectory ".\dist" -PassThru -Wait
+          $code = $p.ExitCode
           if ($code -ne 0) {
             if (Test-Path "dist\SELF_TEST_RESULT.json") { Get-Content "dist\SELF_TEST_RESULT.json" }
+            if (Test-Path "dist\startup_error.txt") { Get-Content "dist\startup_error.txt" }
             throw "DocumentIntake.exe self-test failed with exit code $code"
           }
           if (!(Test-Path "dist\SELF_TEST_RESULT.json")) { throw "SELF_TEST_RESULT.json was not produced" }
@@ -82,7 +81,7 @@ jobs:
         shell: pwsh
         working-directory: tools/document-intake
         run: |
-          $p = Start-Process -FilePath ".\dist\DocumentIntake.exe" -PassThru
+          $p = Start-Process -FilePath ".\dist\DocumentIntake.exe" -WorkingDirectory ".\dist" -PassThru
           Start-Sleep -Seconds 6
           if ($p.HasExited) {
             if (Test-Path ".\dist\startup_error.txt") { Get-Content ".\dist\startup_error.txt" }
