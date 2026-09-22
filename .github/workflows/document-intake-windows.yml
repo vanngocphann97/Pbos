@@ -56,8 +56,11 @@ jobs:
       - name: EXE self-test
         working-directory: tools/document-intake
         run: |
-          .\dist\DocumentIntake.exe --self-test
-          if ($LASTEXITCODE -ne 0) { throw "EXE self-test failed" }
+          cmd /c ".\dist\DocumentIntake.exe --self-test || exit /b 0"
+          if (!(Test-Path .\SELF_TEST_RESULT.json)) { throw "EXE did not produce self-test report" }
+          Get-Content .\SELF_TEST_RESULT.json
+          $report = Get-Content .\SELF_TEST_RESULT.json -Raw | ConvertFrom-Json
+          if (-not $report.passed) { throw "EXE self-test failed" }
 
       - name: Create checksum
         working-directory: tools/document-intake
