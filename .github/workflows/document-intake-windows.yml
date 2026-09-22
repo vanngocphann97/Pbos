@@ -44,10 +44,9 @@ jobs:
         working-directory: tools/document-intake
         run: |
           python DocumentIntake.py --self-test
-          $code=$LASTEXITCODE
-          $global:LASTEXITCODE=0
           if (Test-Path .\SELF_TEST_RESULT.json) { Get-Content .\SELF_TEST_RESULT.json }
-          exit $code
+          $report = Get-Content .\SELF_TEST_RESULT.json -Raw | ConvertFrom-Json
+          if (-not $report.passed) { throw "Core self-test failed" }
 
       - name: Build one-file EXE
         working-directory: tools/document-intake
