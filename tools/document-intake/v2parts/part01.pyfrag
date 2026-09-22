@@ -1,0 +1,153 @@
+                winreg.SetValueEx(k,RUN_NAME,0,winreg.REG_SZ,f'"{sys.executable}" --background')
+            else:
+                try: winreg.DeleteValue(k,RUN_NAME)
+                except FileNotFoundError: pass
+    except Exception:
+        pass
+
+
+class Engine:
+    def __init__(self, cfg=None, root=None):
+        self.cfg=cfg or load_config()
+        self.root=Path(root or self.cfg['workspace'])
+        self.paths={k:self.root/v for k,v in STATES.items()}
+        for p in [*self.paths.values(),LOCAL_APP/'cache',LOCAL_APP/'logs']:
+            p.mkdir(parents=True,exist_ok=True)
+        self.db_file=LOCAL_APP/'index.json'
+        self.db=self._load_db()
+        self.lock=threading.RLock()
+        self.events=queue.Queue()
+        self.stop_event=threading.Event()
+        self.pending=set()
+        self.executor=ThreadPoolExecutor(max_workers=max(1,min(int(self.cfg.get('workers',2)),4)))
+        if os.name=='nt':
+            self.tesseract=BUNDLE_DIR/'runtime'/'tesseract.exe'
+            self.tessdata=BUNDLE_DIR/'runtime'/'tessdata'
+        else:
+            found=shutil.which('tesseract'); self.tesseract=Path(found) if found else BUNDLE_DIR/'runtime'/'tesseract'
+            self.tessdata=Path('/usr/share/tesseract-ocr/5/tessdata') if Path('/usr/share/tesseract-ocr/5/tessdata').is_dir() else BUNDLE_DIR/'runtime'/'tessdata'
+        os.environ['TESSDATA_PREFIX']=str(self.tessdata)
+        os.environ['OMP_THREAD_LIMIT']='1'
+        try:self.user=getpass.getuser()
+        except Exception:self.user='unknown'
+
+    def _load_db(self):
+        try:return json.loads(self.db_file.read_text('utf-8'))
+        except Exception:return {'files':{},'hashes':{},'stats':{},'history':[]}
+
+    def _save_db(self):
+        tmp=self.db_file.with_suffix('.tmp')
+        tmp.write_text(json.dumps(self.db,ensure_ascii=False,indent=2),'utf-8'); tmp.replace(self.db_file)
+
+    def log(self,action,source='',target='',detail=''):
+        p=LOCAL_APP/'logs'/'document_intake.csv'; exists=p.exists()
+        with p.open('a',newline='',encoding='utf-8-sig') as f:
+            w=csv.writer(f)
+            if not exists:w.writerow(['TIME','USER','ACTION','SOURCE','TARGET','DETAIL'])
+            w.writerow([dt.datetime.now().isoformat(timespec='seconds'),self.user,action,str(source),str(target),detail])
+
+    def check_runtime(self):
+        needed=[self.tesseract,self.tessdata/'vie.traineddata',self.tessdata/'eng.traineddata']
+        for p in needed:
+            if not p.is_file(): raise RuntimeError('Thiếu OCR runtime: '+str(p))
+        r=subprocess.run([str(self.tesseract),'--tessdata-dir',str(self.tessdata),'--list-langs'],cwd=self.tesseract.parent,capture_output=True,text=True,timeout=20,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        if r.returncode or not {'vie','eng'}.issubset(set(r.stdout.split())): raise RuntimeError('OCR runtime lỗi: '+r.stderr)
+        return r.stdout
+
+    def _ocr_image(self,image,psm=6):
+        png=self.tesseract.parent/('ocr-'+uuid.uuid4().hex+'.png')
+        try:
+            image.save(png,format='PNG',optimize=False)
+            r=subprocess.run([str(self.tesseract),png.name,'stdout','--tessdata-dir',str(self.tessdata),'-l','vie+eng','--oem','1','--psm',str(psm)],cwd=self.tesseract.parent,capture_output=True,timeout=90,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+            if r.returncode: raise RuntimeError(r.stderr.decode('utf-8',errors='replace'))
+            return r.stdout.decode('utf-8',errors='replace')
+        finally: png.unlink(missing_ok=True)
+
+    def _render_region(self,page,ratio=0.45,max_dim=2200):
+        rect=fitz.Rect(0,0,page.rect.width,page.rect.height*ratio)
+        scale=min(2.0,max_dim/max(rect.width,rect.height))
+        pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale),clip=rect,colorspace=fitz.csRGB,alpha=False)
+        return Image.frombytes('RGB',[pix.width,pix.height],pix.samples)
+
+    def fast_extract(self,p):
+        t0=time.perf_counter(); source='text'; pages=0; text=''; stage='text'
+        with fitz.open(p) as doc:
+            if doc.needs_pass: raise ValueError('PDF có mật khẩu.')
+            if not len(doc): raise ValueError('PDF không có trang.')
+            pages=len(doc); page=doc[0]
+            text=page.get_text('text').strip()
+            m=metadata(text) if len(text)>=60 else {'date':'','number':'','type':'HS','summary':'','org':''}
+            conf,_=confidence(m,'text')
+            if conf < int(self.cfg['auto_threshold']) or not m.get('number') or not m.get('date'):
+                source='ocr'; stage='header-ocr'
+                header=self._ocr_image(self._render_region(page,0.45),6)
+                combo=(text+'\n'+header).strip()
+                m2=metadata(combo); c2,_=confidence(m2,'ocr')
+                if c2>=conf:
+                    m,text,conf=m2,combo,c2
+            if conf < int(self.cfg['auto_threshold']) or not m.get('summary'):
+                stage='page1-ocr'
+                img=self._render_region(page,1.0,2600)
+                full=self._ocr_image(img,3)
+                m3=metadata(full); c3,_=confidence(m3,'ocr')
+                if c3>=conf:
+                    m,text,conf=m3,full,c3
+        conf,fields=confidence(m,source)
+        elapsed=round(time.perf_counter()-t0,3)
+        return dict(m,confidence=conf,field_scores=fields,source=source,stage=stage,text=text,pages=pages,elapsed=elapsed)
+
+    def wait_stable(self,p,timeout=15):
+        end=time.time()+timeout; last=None; stable_since=None
+        while time.time()<end and not self.stop_event.is_set():
+            try:s=(p.stat().st_size,p.stat().st_mtime_ns)
+            except FileNotFoundError:return False
+            if s==last:
+                stable_since=stable_since or time.time()
+                if time.time()-stable_since>=float(self.cfg.get('stable_wait_sec',1.0)):return True
+            else:last=s;stable_since=None
+            time.sleep(.25)
+        return p.exists()
+
+    def _record(self,p,d):
+        key=str(p.resolve()).lower()
+        with self.lock:
+            self.db['files'][key]=d
+            self._save_db()
+
+    def lookup(self,p):
+        return self.db.get('files',{}).get(str(p.resolve()).lower(),{})
+
+    def list_state(self,state):
+        return sorted(self.paths[state].glob('*.pdf'),key=lambda p:p.stat().st_mtime,reverse=True)
+
+    def _unique_dest(self,folder,name):
+        dest=folder/name
+        if not dest.exists(): return dest
+        stem=dest.stem; i=2
+        while True:
+            c=folder/f'{stem}_{i:02d}.pdf'
+            if not c.exists(): return c
+            i+=1
+
+    def _move(self,p,state,name=None):
+        dest=self._unique_dest(self.paths[state],name or p.name)
+        p.replace(dest); return dest
+
+    def process_file(self,p,force_review=False):
+        p=Path(p)
+        try:
+            if not self.wait_stable(p): return
+            file_hash=sha256_file(p)
+            with self.lock:
+                prior=self.db.get('hashes',{}).get(file_hash)
+            if prior and Path(prior).exists():
+                dst=self._move(p,'DUPLICATE')
+                d={'status':'DUPLICATE','hash':file_hash,'duplicate_of':prior,'confidence':100,'processed_at':dt.datetime.now().isoformat()}
+                self._record(dst,d); self.log('DUPLICATE',p,dst,prior); self.events.put(('processed',dst,d)); return
+            d=self.fast_extract(p); d['hash']=file_hash; d['original_name']=p.name; d['processed_at']=dt.datetime.now().isoformat()
+            complete=valid_date(d.get('date','')) and bool(token(d.get('number'))) and d.get('type')!='HS' and bool(d.get('summary'))
+            auto=(d['confidence']>=int(self.cfg['auto_threshold']) and complete and not force_review)
+            if auto:
+                dst=self._move(p,'COMPLETED',proposed(d,int(self.cfg.get('summary_words',8))))
+                d['status']='AUTO'; self.log('AUTO_COMPLETE',p,dst,f"confidence={d['confidence']} stage={d['stage']} {d['elapsed']}s")
+            else:
