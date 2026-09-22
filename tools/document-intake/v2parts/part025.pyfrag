@@ -1,0 +1,13 @@
+
+# v2 enrichment: infer organization from both body text and document number.
+def metadata(text):
+    n=extract_number(text)
+    kind=extract_type(text,n)
+    org=extract_org(text)
+    nt=token(n)
+    if not org:
+        for code in ['BTH','FAST','FPT','VNPT','VIETTEL','PAVN']:
+            if re.search(r'(^|-)'+re.escape(code)+r'(-|$)',nt):
+                org=code
+                break
+    return {'date':extract_date(text),'number':n,'type':kind,'summary':extract_summary(text,kind),'org':org}
