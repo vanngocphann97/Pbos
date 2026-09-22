@@ -36,7 +36,7 @@ jobs:
           )
           $out = "tools/document-intake/DocumentIntake_v2.py"
           if (Test-Path $out) { Remove-Item $out -Force }
-          foreach ($p in $parts) { Get-Content $p -Raw | Add-Content $out -Encoding utf8 -NoNewline }
+          foreach ($p in $parts) { Get-Content $p -Raw | Add-Content $out -Encoding utf8; Add-Content $out "" -Encoding utf8 }
           $src = Get-Content $out -Raw
           $src = $src.Replace("startswith('20260922_123-2026-CV-BTH_CV_BTH_')","startswith('20260922_123-2026-CV-BTH_CV_')")
           Set-Content $out $src -Encoding utf8 -NoNewline
