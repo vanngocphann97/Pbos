@@ -642,7 +642,7 @@ def self_test_core():
         report['error']=traceback.format_exc()
         try: print(report['error'], file=sys.stderr, flush=True)
         except Exception: pass
-    target=APP_DIR/'SELF_TEST_RESULT.json'
+    target=(Path.cwd() if getattr(sys,'frozen',False) else APP_DIR)/'SELF_TEST_RESULT.json'
     try: target.write_text(json.dumps(report,ensure_ascii=False,indent=2),'utf-8')
     except Exception: pass
     return report
