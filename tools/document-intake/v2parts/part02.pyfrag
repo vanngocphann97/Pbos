@@ -1,0 +1,130 @@
+                dst=self._move(p,'REVIEW')
+                d['status']='REVIEW'; self.log('REVIEW',p,dst,f"confidence={d['confidence']} stage={d['stage']} {d['elapsed']}s")
+            with self.lock:self.db['hashes'][file_hash]=str(dst.resolve())
+            self._record(dst,d); self.events.put(('processed',dst,d))
+        except Exception as exc:
+            try:dst=self._move(p,'ERROR') if p.exists() else p
+            except Exception:dst=p
+            d={'status':'ERROR','error':str(exc),'processed_at':dt.datetime.now().isoformat()}
+            if dst.exists(): self._record(dst,d)
+            self.log('ERROR',p,dst,str(exc)); self.events.put(('processed',dst,d))
+        finally:
+            with self.lock:self.pending.discard(str(p.resolve()).lower())
+
+    def enqueue(self,p,force_review=False):
+        p=Path(p); key=str(p.resolve()).lower()
+        with self.lock:
+            if key in self.pending:return False
+            self.pending.add(key)
+        self.executor.submit(self.process_file,p,force_review); return True
+
+    def scan_inbox(self):
+        n=0
+        for p in self.paths['INBOX'].glob('*.pdf'):
+            if self.enqueue(p):n+=1
+        return n
+
+    def watch_loop(self):
+        seen={}
+        while not self.stop_event.is_set():
+            for p in self.paths['INBOX'].glob('*.pdf'):
+                try:s=(p.stat().st_size,p.stat().st_mtime_ns)
+                except FileNotFoundError:continue
+                key=str(p.resolve()).lower()
+                if seen.get(key)!=s:
+                    seen[key]=s
+                else:
+                    self.enqueue(p)
+            time.sleep(float(self.cfg.get('watch_interval_sec',1.5)))
+
+    def start_watch(self):
+        t=threading.Thread(target=self.watch_loop,daemon=True); t.start(); return t
+
+    def stop(self):
+        self.stop_event.set(); self.executor.shutdown(wait=False,cancel_futures=False)
+
+    def approve_review(self,p,values):
+        p=Path(p); d=self.lookup(p).copy(); d.update(values)
+        if not valid_date(d.get('date','')): raise ValueError('Ngày không hợp lệ.')
+        if not token(d.get('number')): raise ValueError('Thiếu số/ký hiệu.')
+        if not d.get('type') or d.get('type')=='HS': raise ValueError('Thiếu loại hồ sơ.')
+        if not d.get('summary'): raise ValueError('Thiếu nội dung.')
+        old=str(p.resolve()).lower(); dst=self._move(p,'COMPLETED',proposed(d,int(self.cfg.get('summary_words',8))))
+        d['status']='MANUAL'; d['confidence']=100; d['approved_at']=dt.datetime.now().isoformat()
+        with self.lock:
+            self.db['files'].pop(old,None); self.db['hashes'][d.get('hash','')]=str(dst.resolve()); self._save_db()
+        self._record(dst,d); self.log('MANUAL_COMPLETE',p,dst)
+        return dst
+
+    def undo_last(self):
+        # Lightweight safety: move most recent completed file back to Review.
+        files=self.list_state('COMPLETED')
+        if not files: return None
+        p=files[0]; d=self.lookup(p).copy(); old=str(p.resolve()).lower(); dst=self._move(p,'REVIEW',d.get('original_name') or p.name)
+        d['status']='REVIEW'; d['undo_at']=dt.datetime.now().isoformat()
+        with self.lock:self.db['files'].pop(old,None);self._save_db()
+        self._record(dst,d); self.log('UNDO',p,dst); return dst
+
+    def stats_today(self):
+        day=dt.date.today().isoformat(); out={k:0 for k in ['AUTO','MANUAL','REVIEW','ERROR','DUPLICATE']}
+        for d in self.db.get('files',{}).values():
+            if str(d.get('processed_at','')).startswith(day) or str(d.get('approved_at','')).startswith(day):
+                s=d.get('status')
+                if s in out:out[s]+=1
+        return out
+
+
+class App(tk.Tk):
+    def __init__(self,engine):
+        super().__init__(); self.engine=engine; self.current=None; self.rows={}; self.photo=None
+        self.title(f'Document Intake Auto Agent • {APP_VERSION}'); self.geometry('1180x760'); self.minsize(960,620)
+        self.protocol('WM_DELETE_WINDOW',self.hide_window)
+        self.status=tk.StringVar(value='Auto Agent đang chạy'); self.stats=tk.StringVar(); self.filename=tk.StringVar(); self.conf=tk.StringVar()
+        self.vars={k:tk.StringVar() for k in ['date','number','type','org','summary']}
+        ttk.Style(self).theme_use('clam')
+        head=ttk.Frame(self,padding=14);head.pack(fill='x')
+        ttk.Label(head,text='DOCUMENT INTAKE',font=('Segoe UI',20,'bold')).pack(side='left')
+        ttk.Label(head,text='AUTO AGENT',font=('Segoe UI',11,'bold')).pack(side='left',padx=12)
+        ttk.Button(head,text='Mở Inbox',command=lambda:os.startfile(self.engine.paths['INBOX'])).pack(side='right',padx=3)
+        ttk.Button(head,text='Quét ngay',command=self.scan_now).pack(side='right',padx=3)
+        ttk.Button(head,text='Hoàn tác file cuối',command=self.undo).pack(side='right',padx=3)
+        card=ttk.Frame(self,padding=(14,0,14,10));card.pack(fill='x')
+        ttk.Label(card,textvariable=self.stats,font=('Segoe UI',12,'bold')).pack(side='left')
+        ttk.Label(card,textvariable=self.status).pack(side='right')
+        pan=ttk.Panedwindow(self,orient='horizontal');pan.pack(fill='both',expand=True,padx=14,pady=(0,10))
+        left=ttk.Frame(pan);right=ttk.Frame(pan,padding=(12,0));pan.add(left,weight=3);pan.add(right,weight=2)
+        self.tree=ttk.Treeview(left,columns=('file','confidence','suggested'),show='headings',selectmode='browse')
+        for k,t,w in [('file','Cần kiểm tra',210),('confidence','Tin cậy',75),('suggested','Tên đề xuất',390)]:
+            self.tree.heading(k,text=t);self.tree.column(k,width=w,anchor='w')
+        self.tree.pack(fill='both',expand=True);self.tree.bind('<<TreeviewSelect>>',self.pick)
+        form=ttk.LabelFrame(right,text='Chỉ sửa trường chưa đúng',padding=10);form.pack(fill='x')
+        for i,(k,label) in enumerate([('date','Ngày'),('number','Số / ký hiệu'),('type','Loại'),('org','Đơn vị'),('summary','Nội dung')]):
+            ttk.Label(form,text=label).grid(row=i,column=0,sticky='w',pady=5)
+            e=ttk.Entry(form,textvariable=self.vars[k],width=36);e.grid(row=i,column=1,sticky='ew',padx=8)
+        form.columnconfigure(1,weight=1)
+        ttk.Label(form,textvariable=self.filename,wraplength=430,foreground='#145983').grid(row=6,column=0,columnspan=2,sticky='w',pady=(10,3))
+        ttk.Label(form,textvariable=self.conf).grid(row=7,column=0,columnspan=2,sticky='w')
+        b=ttk.Frame(right);b.pack(fill='x',pady=10)
+        ttk.Button(b,text='Duyệt (Enter)',command=self.approve).pack(side='left',padx=3)
+        ttk.Button(b,text='Mở PDF',command=self.open_pdf).pack(side='left',padx=3)
+        self.preview=ttk.LabelFrame(right,text='Quick Preview',padding=4);self.preview.pack(fill='both',expand=True)
+        self.canvas=tk.Canvas(self.preview,bg='#e5e7eb',highlightthickness=0);self.canvas.pack(fill='both',expand=True)
+        self.bind('<Return>',lambda e:self.approve())
+        for v in self.vars.values():v.trace_add('write',lambda *a:self.update_proposed())
+        ttk.Label(self,text=f'{COPYRIGHT} • Chạy nền • Không cần bấm OCR',padding=(12,0,12,8),foreground='#6b7280').pack(fill='x')
+        self.refresh();self.after(300,self.poll)
+
+    def hide_window(self):
+        self.withdraw(); self.status.set('Đang chạy nền • mở lại EXE để xem Review')
+
+    def deiconify_safe(self):
+        self.deiconify();self.lift();self.focus_force()
+
+    def scan_now(self):
+        n=self.engine.scan_inbox();self.status.set(f'Đã đưa {n} file vào hàng đợi')
+
+    def refresh(self):
+        self.tree.delete(*self.tree.get_children());self.rows={}
+        for p in self.engine.list_state('REVIEW'):
+            d=self.engine.lookup(p); iid=self.tree.insert('','end',values=(p.name,f"{d.get('confidence',0)}%",proposed(d,int(self.engine.cfg.get('summary_words',8)))))
+            self.rows[iid]=p
