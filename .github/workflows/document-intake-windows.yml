@@ -42,7 +42,11 @@ jobs:
 
       - name: Core test on Windows
         working-directory: tools/document-intake
-        run: python DocumentIntake.py --self-test
+        run: |
+          python DocumentIntake.py --self-test
+          $code=$LASTEXITCODE
+          if (Test-Path .\SELF_TEST_RESULT.json) { Get-Content .\SELF_TEST_RESULT.json }
+          exit $code
 
       - name: Build one-file EXE
         working-directory: tools/document-intake
