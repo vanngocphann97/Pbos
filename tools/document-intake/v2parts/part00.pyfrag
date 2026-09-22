@@ -1,0 +1,224 @@
+# -*- coding: utf-8 -*-
+"""Document Intake 2.0 - zero-touch offline document agent for Windows.
+No QR processing. One source file, packaged as one EXE.
+"""
+from pathlib import Path
+import csv, datetime as dt, getpass, hashlib, json, os, queue, re, shutil, subprocess, sys, threading, time, unicodedata, uuid
+from concurrent.futures import ThreadPoolExecutor
+import tkinter as tk
+from tkinter import ttk, messagebox
+import pymupdf as fitz
+from PIL import Image, ImageTk, ImageDraw, ImageFont
+
+APP_VERSION = '2.0.0 (2026-09-22)'
+COPYRIGHT = 'Bản quyền © 2026 Phan Văn Ngọc'
+APP_EXE_DIR = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else Path(__file__).resolve().parent
+BUNDLE_DIR = Path(getattr(sys, '_MEIPASS', APP_EXE_DIR))
+LOCAL_APP = Path(os.environ.get('LOCALAPPDATA', APP_EXE_DIR)) / 'DocumentIntake'
+DEFAULT_WORKSPACE = Path.home() / 'Documents' / 'DocumentIntake'
+CONFIG_FILE = LOCAL_APP / 'config.json'
+RUN_KEY = r'Software\Microsoft\Windows\CurrentVersion\Run'
+RUN_NAME = 'DocumentIntake'
+
+DEFAULT_CONFIG = {
+    'workspace': str(DEFAULT_WORKSPACE),
+    'watch_enabled': True,
+    'watch_interval_sec': 1.5,
+    'stable_wait_sec': 1.0,
+    'auto_threshold': 92,
+    'workers': 2,
+    'startup': True,
+    'summary_words': 8,
+}
+
+STATES = {
+    'INBOX': 'Inbox',
+    'REVIEW': 'Review',
+    'COMPLETED': 'Completed',
+    'ERROR': 'Error',
+    'DUPLICATE': 'Duplicate',
+}
+
+TYPE_RULES = [
+    ('BIEN-BAN-THANH-LY','BBTL'), ('DE-NGHI-THANH-TOAN','DNTT'), ('PHIEU-DE-XUAT','PDX'),
+    ('TO-TRINH','TTR'), ('QUYET-DINH','QD'), ('CONG-VAN','CV'), ('THONG-BAO','TB'),
+    ('THU-THONG-BAO','TB'), ('PHU-LUC','PL'), ('BIEN-BAN','BB'), ('HOP-DONG','HD'),
+    ('HOA-DON','HDON')
+]
+
+ORG_DICT = [
+    (r'cong ty co phan phat trien va dich vu nha ben thanh|nha ben thanh|benthanh house', 'BTH'),
+    (r'tong cong ty ben thanh|benthanh group', 'BENTHANHGROUP'),
+    (r'fast business online|cong ty co phan phan mem quan ly doanh nghiep|\bfast\b', 'FAST'),
+    (r'fpt telecom|vien thong fpt|\bfpt\b', 'FPT'),
+    (r'pa vietnam|pavietnam', 'PAVN'),
+    (r'viettel', 'VIETTEL'),
+    (r'vnpt', 'VNPT'),
+]
+
+STOP_SUMMARY = {
+    'VE','VIEC','VA','CAC','CHO','CỦA','CUA','THEO','TRONG','TAI','VÀ','VA','ĐẾN','DEN','VỚI','VOI','VỀ','VE',
+    'THỰC','THUC','HIỆN','HIEN','CÔNG','CONG','TY','PHẦN','PHAN','DỊCH','DICH','VỤ','VU'
+}
+
+
+def fold(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', (s or '').replace('đ','d').replace('Đ','D')) if unicodedata.category(c) != 'Mn')
+
+
+def token(s):
+    return re.sub(r'[^A-Z0-9]+', '-', fold(s).upper()).strip('-')
+
+
+def valid_date(s):
+    try:
+        return len(s) == 8 and s.isdigit() and dt.datetime.strptime(s, '%Y%m%d').strftime('%Y%m%d') == s
+    except ValueError:
+        return False
+
+
+def normalize_summary(s, max_words=8):
+    toks = [x for x in token(s).split('-') if x]
+    out=[]
+    for x in toks:
+        if x in STOP_SUMMARY and out:
+            continue
+        if x not in out:
+            out.append(x)
+        if len(out) >= max_words:
+            break
+    return '-'.join(out)[:90] or 'HO-SO'
+
+
+def extract_date(text):
+    lines = fold(text).lower().splitlines()
+    candidates=[]
+    for i,s in enumerate(lines[:40]):
+        if 'ngay' in s and not re.search(r'(can cu|quyet dinh so|thoi gian|thoi han|den ngay|thanh toan)', s):
+            if re.search(r'(tp[., ]|ho chi minh|hcm|ha noi|ngay\s*[:：]?|ngay\s*\d+\s*thang)', s):
+                candidates.append(s)
+    for line in candidates:
+        for pat in [
+            r'ngay\s*[:：]?\s*(\d{1,2})\s*thang\s*(\d{1,2})\s*nam\s*((?:19|20)\d{2})',
+            r'\b(\d{1,2})\s*[./-]\s*(\d{1,2})\s*[./-]\s*((?:19|20)\d{2})\b'
+        ]:
+            m=re.search(pat,line)
+            if m:
+                d,mn,y=map(int,m.groups()); v=f'{y:04d}{mn:02d}{d:02d}'
+                if valid_date(v): return v
+    return ''
+
+
+def extract_number(text):
+    a=fold(text)
+    for line in a.splitlines()[:45]:
+        m=re.search(r'\bso\s*[:：.]?\s*([0-9][A-Za-z0-9./_ -]*)', line, re.I)
+        if not m: continue
+        value=re.split(r'\s{2,}|\s+(?:ngay|v/v|ve|kinh gui)\b',m.group(1),flags=re.I)[0].strip()
+        value=re.sub(r'\s*([/.-])\s*',r'\1',value).split(' ')[0].strip('.-_/')
+        if value: return value
+    return ''
+
+
+def extract_type(text, number=''):
+    lines=text.splitlines()[:40]
+    for line in lines:
+        a=token(line)
+        for title,short in TYPE_RULES:
+            if a == title or (a.startswith(title+'-') and len(a) < 110): return short
+    n=token(number)
+    for short in sorted({s for _,s in TYPE_RULES},key=len,reverse=True):
+        if re.search(r'(^|-)'+re.escape(short)+r'(-|$)',n): return short
+    return 'HS'
+
+
+def extract_org(text):
+    f=fold(text).lower()
+    for pat,label in ORG_DICT:
+        if re.search(pat,f,re.I): return label
+    return ''
+
+
+def extract_summary(text, kind):
+    lines=[re.sub(r'\s+',' ',x).strip() for x in text.splitlines() if x.strip()]
+    for line in lines[:45]:
+        m=re.search(r'(?i)\b(?:v\s*[/i]\s*[vw]|về việc|ve viec|về|ve)\s*[:：.-]?\s*(.+)', line)
+        if m and len(m.group(1).strip())>4:
+            return m.group(1).strip()[:160]
+    for i,line in enumerate(lines[:60]):
+        f=fold(line).lower()
+        m=re.match(r'^(?:noi dung thanh toan|noi dung de xuat|muc dich su dung)\s*[:：]?\s*(.*)',f,re.I)
+        if m:
+            if len(m.group(1).strip())>8:
+                return line.split(':',1)[-1].strip()[:160]
+            for nxt in lines[i+1:i+3]:
+                if len(nxt)>10:return nxt[:160]
+    for i,line in enumerate(lines[:35]):
+        a=token(line)
+        if any(a.startswith(title) for title,short in TYPE_RULES if short==kind):
+            for nxt in lines[i+1:i+5]:
+                fn=fold(nxt).lower()
+                if not re.match(r'^(so\b|kinh gui|can cu|cong hoa|doc lap|tp\.|ngay\b)',fn):
+                    return nxt[:160]
+    return ''
+
+
+def metadata(text):
+    n=extract_number(text); kind=extract_type(text,n)
+    return {'date':extract_date(text),'number':n,'type':kind,'summary':extract_summary(text,kind),'org':extract_org(text)}
+
+
+def confidence(m, source='ocr'):
+    scores={
+        'date': 100 if valid_date(m.get('date','')) else 0,
+        'number': 100 if token(m.get('number')) and len(token(m.get('number')))>=2 else 0,
+        'type': 100 if m.get('type') and m.get('type')!='HS' else 60 if m.get('type') else 0,
+        'summary': 100 if len(token(m.get('summary')))>=8 else 60 if m.get('summary') else 0,
+    }
+    weights={'date':25,'number':30,'type':20,'summary':25}
+    total=sum(scores[k]*weights[k] for k in weights)/100
+    if source=='text': total=min(100,total+3)
+    return int(round(total)),scores
+
+
+def proposed(m,max_words=8):
+    parts=[m.get('date') or '00000000', token(m.get('number'))[:45] or 'KSO', token(m.get('type'))[:15] or 'HS']
+    if m.get('org'): parts.append(token(m['org'])[:20])
+    parts.append(normalize_summary(m.get('summary',''),max_words))
+    return '_'.join(parts)+'.pdf'
+
+
+def sha256_file(p,chunk=1024*1024):
+    h=hashlib.sha256()
+    with p.open('rb') as f:
+        while True:
+            b=f.read(chunk)
+            if not b:break
+            h.update(b)
+    return h.hexdigest()
+
+
+def load_config():
+    LOCAL_APP.mkdir(parents=True,exist_ok=True)
+    cfg=dict(DEFAULT_CONFIG)
+    if CONFIG_FILE.exists():
+        try: cfg.update(json.loads(CONFIG_FILE.read_text('utf-8')))
+        except Exception: pass
+    try:
+        Path(cfg['workspace']).mkdir(parents=True,exist_ok=True)
+    except Exception:
+        cfg['workspace']=str(DEFAULT_WORKSPACE)
+    return cfg
+
+
+def save_config(cfg):
+    LOCAL_APP.mkdir(parents=True,exist_ok=True)
+    CONFIG_FILE.write_text(json.dumps(cfg,ensure_ascii=False,indent=2),'utf-8')
+
+
+def set_startup(enabled):
+    if os.name!='nt': return
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,RUN_KEY,0,winreg.KEY_SET_VALUE) as k:
+            if enabled:
