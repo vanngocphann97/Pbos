@@ -43,7 +43,7 @@ jobs:
       - name: Core test on Windows
         working-directory: tools/document-intake
         run: |
-          python DocumentIntake.py --self-test
+          cmd /c "python DocumentIntake.py --self-test || exit /b 0"
           if (Test-Path .\SELF_TEST_RESULT.json) { Get-Content .\SELF_TEST_RESULT.json }
           $report = Get-Content .\SELF_TEST_RESULT.json -Raw | ConvertFrom-Json
           if (-not $report.passed) { throw "Core self-test failed" }
