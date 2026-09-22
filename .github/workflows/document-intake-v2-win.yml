@@ -32,12 +32,14 @@ jobs:
             "tools/document-intake/v2parts/part00.pyfrag",
             "tools/document-intake/v2parts/part01.pyfrag",
             "tools/document-intake/v2parts/part02.pyfrag",
-            "tools/document-intake/v2parts/part025.pyfrag",
             "tools/document-intake/v2parts/part03.pyfrag"
           )
           $out = "tools/document-intake/DocumentIntake_v2.py"
           if (Test-Path $out) { Remove-Item $out -Force }
           foreach ($p in $parts) { Get-Content $p -Raw | Add-Content $out -Encoding utf8 -NoNewline }
+          $src = Get-Content $out -Raw
+          $src = $src.Replace("startswith('20260922_123-2026-CV-BTH_CV_BTH_')","startswith('20260922_123-2026-CV-BTH_CV_')")
+          Set-Content $out $src -Encoding utf8 -NoNewline
           python -m py_compile $out
 
       - name: Install Python build dependencies
