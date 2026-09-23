@@ -7,7 +7,7 @@ from tkinter import ttk, messagebox
 import pymupdf as fitz
 from PIL import Image, ImageTk
 
-APP_VERSION = '2.1.0 Agent #01 (2026-09-22)'
+APP_VERSION = '2.2.0 Agent #01 (2026-09-23)'
 AUTO_THRESHOLD = 90
 WATCH_INTERVAL_MS = 2500
 COPYRIGHT = 'Bản quyền © 2026 Phan Văn Ngọc'
@@ -382,118 +382,180 @@ class Engine:
         return out
 
 class App(tk.Tk):
+    BG='#f5f7fb'; CARD='#ffffff'; BLUE='#1769e0'; TEXT='#172033'; MUTED='#667085'; GREEN='#159455'; ORANGE='#d97706'; RED='#d92d20'
     def __init__(self,engine=None):
-        super().__init__()
-        self.engine=engine or Engine()
-        self.title(f'Document Intake • Portable • {APP_VERSION}')
-        self.geometry('1260x800'); self.minsize(1000,650)
-        self.busy=False; self.current=None; self.rows={}; self.events=queue.Queue();self.entries=[];self.page_index=0
-        self.watch_enabled=tk.BooleanVar(value=True); self.seen={}
+        super().__init__(); self.engine=engine or Engine()
+        self.title('Document Intake - Benthanh House'); self.geometry('1440x860'); self.minsize(1120,700); self.configure(bg=self.BG)
+        self.busy=False; self.current=None; self.rows={}; self.events=queue.Queue(); self.entries=[]; self.page_index=0
+        self.watch_enabled=tk.BooleanVar(value=True); self.pending={}; self.active_state='REVIEW'
         self.protocol('WM_DELETE_WINDOW',self.close)
         self.vars={k:tk.StringVar() for k in ['date','number','type','summary']}
-        self.state=tk.StringVar(value='INBOX'); self.status=tk.StringVar(value='Sẵn sàng')
-        ttk.Style(self).theme_use('clam')
-        head=ttk.Frame(self,padding=12); head.pack(fill='x')
-        ttk.Label(head,text='DOCUMENT INTAKE',font=('Segoe UI',20,'bold')).pack(side='left')
-        ttk.Label(head,text=f'OCR tiếng Việt + English • Hoạt động ngoại tuyến • {APP_VERSION}').pack(side='left',padx=20)
-        self.controls=[]
-        def button(parent,text,fn):
-            b=ttk.Button(parent,text=text,command=fn); b.pack(side='left',padx=3); self.controls.append(b); return b
-        bar=ttk.Frame(self,padding=(12,0,12,10));bar.pack(fill='x')
-        self.combo=ttk.Combobox(bar,textvariable=self.state,values=list(STATES),state='readonly',width=15)
-        self.combo.pack(side='left',padx=3);self.combo.bind('<<ComboboxSelected>>',lambda e:self.scan())
-        button(bar,'Quét thư mục',self.scan)
-        button(bar,'OCR hàng loạt',self.ocr_all)
-        button(bar,'OCR lại hồ sơ',self.reocr_current)
-        ttk.Checkbutton(bar,text='Auto Agent',variable=self.watch_enabled).pack(side='left',padx=10)
-        button(bar,'Mở thư mục',lambda:os.startfile(self.engine.root/STATES[self.state.get()]))
-        pan=ttk.Panedwindow(self,orient='horizontal');pan.pack(fill='both',expand=True,padx=12)
-        left=ttk.Frame(pan); right=ttk.Frame(pan,padding=(12,0)); pan.add(left,weight=3);pan.add(right,weight=2)
-        self.tree=ttk.Treeview(left,columns=('file','name','status'),show='headings',selectmode='browse')
-        for key,title,width in [('file','PDF gốc',180),('name','Tên đề xuất',340),('status','Trạng thái',110)]:
-            self.tree.heading(key,text=title);self.tree.column(key,width=width)
-        self.tree.pack(fill='both',expand=True)
-        self.tree.bind('<<TreeviewSelect>>',self.pick)
-        scroll=ttk.Scrollbar(left,orient='horizontal',command=self.tree.xview);scroll.pack(fill='x');self.tree.configure(xscrollcommand=scroll.set)
-        form=ttk.LabelFrame(right,text='Kiểm tra và chỉnh sửa metadata',padding=10);form.pack(fill='x')
-        for i,(key,label) in enumerate([('date','Ngày (YYYYMMDD)'),('number','Số / ký hiệu'),('type','Loại hồ sơ'),('summary','Nội dung vắn tắt')]):
-            ttk.Label(form,text=label).grid(row=i,column=0,sticky='w',pady=5)
-            e=ttk.Entry(form,textvariable=self.vars[key],width=38);e.grid(row=i,column=1,sticky='ew',padx=8)
-            self.entries.append(e)
-            self.vars[key].trace_add('write',lambda *args:self.preview())
+        self.status=tk.StringVar(value='Sẵn sàng • Tự động theo dõi thư mục hồ sơ mới')
+        self.count_vars={k:tk.StringVar(value='0') for k in STATES}
+        self._style(); self._build(); self.scan('REVIEW'); self.after(100,self.poll); self.after(WATCH_INTERVAL_MS,self.watch_tick)
+
+    def _style(self):
+        s=ttk.Style(self); s.theme_use('clam')
+        s.configure('TFrame',background=self.BG); s.configure('Card.TFrame',background=self.CARD)
+        s.configure('TLabel',background=self.BG,foreground=self.TEXT,font=('Segoe UI',10))
+        s.configure('Card.TLabel',background=self.CARD,foreground=self.TEXT,font=('Segoe UI',10))
+        s.configure('Title.TLabel',background=self.BG,foreground=self.TEXT,font=('Segoe UI',22,'bold'))
+        s.configure('Sub.TLabel',background=self.BG,foreground=self.MUTED,font=('Segoe UI',10))
+        s.configure('Primary.TButton',font=('Segoe UI',10,'bold'),padding=(14,9),background=self.BLUE,foreground='white')
+        s.map('Primary.TButton',background=[('active','#1258bd'),('disabled','#9bbce9')])
+        s.configure('TButton',font=('Segoe UI',10),padding=(11,8))
+        s.configure('Treeview',font=('Segoe UI',10),rowheight=34,background='white',fieldbackground='white',borderwidth=0)
+        s.configure('Treeview.Heading',font=('Segoe UI',9,'bold'),padding=8,background='#eef2f7',foreground=self.TEXT)
+        s.map('Treeview',background=[('selected','#e8f1ff')],foreground=[('selected',self.TEXT)])
+        s.configure('TLabelframe',background=self.CARD); s.configure('TLabelframe.Label',background=self.CARD,font=('Segoe UI',10,'bold'))
+        s.configure('TEntry',padding=7)
+
+    def _build(self):
+        top=ttk.Frame(self,padding=(22,16)); top.pack(fill='x')
+        title=ttk.Frame(top); title.pack(side='left')
+        ttk.Label(title,text='DOCUMENT INTAKE',style='Title.TLabel').pack(anchor='w')
+        ttk.Label(title,text='Tự động nhận diện • Đổi tên • Phân luồng hồ sơ',style='Sub.TLabel').pack(anchor='w')
+        right=ttk.Frame(top); right.pack(side='right')
+        self.agent_label=ttk.Label(right,text='●  Tự động đang hoạt động',foreground=self.GREEN,font=('Segoe UI',10,'bold')); self.agent_label.pack(side='left',padx=12)
+        ttk.Checkbutton(right,variable=self.watch_enabled,command=self._toggle_agent).pack(side='left')
+
+        summary=ttk.Frame(self,padding=(22,0,22,12)); summary.pack(fill='x')
+        cards=[('INBOX','Hồ sơ mới',self.BLUE),('REVIEW','Cần kiểm tra',self.ORANGE),('COMPLETED','Đã xử lý',self.GREEN),('ERROR','Lỗi xử lý',self.RED)]
+        for key,label,color in cards:
+            box=tk.Frame(summary,bg='white',highlightbackground='#e4e7ec',highlightthickness=1); box.pack(side='left',fill='x',expand=True,padx=(0,10))
+            tk.Label(box,textvariable=self.count_vars[key],bg='white',fg=color,font=('Segoe UI',22,'bold')).pack(anchor='w',padx=16,pady=(12,0))
+            tk.Label(box,text=label,bg='white',fg=self.TEXT,font=('Segoe UI',10,'bold')).pack(anchor='w',padx=16,pady=(0,12))
+
+        main=ttk.Panedwindow(self,orient='horizontal'); main.pack(fill='both',expand=True,padx=22,pady=(0,10))
+        left=ttk.Frame(main,style='Card.TFrame',padding=12); right=ttk.Frame(main,style='Card.TFrame',padding=14)
+        main.add(left,weight=7); main.add(right,weight=4)
+
+        nav=ttk.Frame(left,style='Card.TFrame'); nav.pack(fill='x',pady=(0,10))
+        self.nav_buttons={}
+        for key,label in [('INBOX','Hồ sơ mới'),('REVIEW','Cần kiểm tra'),('COMPLETED','Đã xử lý'),('ERROR','Lỗi xử lý')]:
+            b=ttk.Button(nav,text=label,command=lambda k=key:self.scan(k)); b.pack(side='left',padx=(0,6)); self.nav_buttons[key]=b
+        ttk.Button(nav,text='+ Thêm PDF',style='Primary.TButton',command=self.add_files).pack(side='right',padx=(6,0))
+        ttk.Button(nav,text='Mở thư mục',command=self.open_active_folder).pack(side='right')
+
+        self.tree=ttk.Treeview(left,columns=('file','name','type','date','confidence','status'),show='headings',selectmode='browse')
+        cols=[('file','Tên file hiện tại',185),('name','Tên đề xuất',330),('type','Loại',70),('date','Ngày',85),('confidence','Tin cậy',75),('status','Trạng thái',110)]
+        for key,label,w in cols:self.tree.heading(key,text=label);self.tree.column(key,width=w,minwidth=55)
+        self.tree.pack(fill='both',expand=True); self.tree.bind('<<TreeviewSelect>>',self.pick)
+        y=ttk.Scrollbar(left,orient='vertical',command=self.tree.yview); self.tree.configure(yscrollcommand=y.set)
+
+        bottom=ttk.Frame(left,style='Card.TFrame'); bottom.pack(fill='x',pady=(10,0))
+        ttk.Button(bottom,text='Xử lý lại OCR',command=self.reocr_current).pack(side='left')
+        self.approve_btn=ttk.Button(bottom,text='Duyệt & hoàn tất',style='Primary.TButton',command=self.approve); self.approve_btn.pack(side='right')
+        ttk.Button(bottom,text='Đưa về hồ sơ mới',command=lambda:self.transfer('INBOX')).pack(side='right',padx=6)
+
+        ttk.Label(right,text='XEM TRƯỚC & THÔNG TIN',style='Card.TLabel',font=('Segoe UI',11,'bold')).pack(anchor='w')
+        self.preview_box=tk.Canvas(right,bg='#eef2f6',height=280,highlightthickness=0); self.preview_box.pack(fill='x',pady=(10,10))
+        self.preview_box.bind('<MouseWheel>',lambda e:self.preview_box.yview_scroll(-int(e.delta/120),'units'))
+
+        form=ttk.LabelFrame(right,text='Thông tin trích xuất',padding=10); form.pack(fill='x')
+        for i,(key,label) in enumerate([('date','Ngày văn bản'),('number','Số / Ký hiệu'),('type','Loại hồ sơ'),('summary','Nội dung vắn tắt')]):
+            ttk.Label(form,text=label,style='Card.TLabel').grid(row=i,column=0,sticky='w',pady=4)
+            e=ttk.Entry(form,textvariable=self.vars[key]); e.grid(row=i,column=1,sticky='ew',padx=(10,0),pady=4); self.entries.append(e)
+            self.vars[key].trace_add('write',lambda *args:self.preview_name())
         form.columnconfigure(1,weight=1)
-        self.new=tk.StringVar();ttk.Label(form,textvariable=self.new,wraplength=440,foreground='#145983').grid(row=5,column=0,columnspan=2,sticky='w',pady=12)
-        b=ttk.Frame(right);b.pack(fill='x',pady=10)
-        button(b,'Lưu metadata',self.save_current);button(b,'Duyệt & đổi tên',self.approve)
-        b2=ttk.Frame(right);b2.pack(fill='x',pady=(0,10))
-        button(b2,'→ REVIEW',lambda:self.transfer('REVIEW'));button(b2,'→ ERROR',lambda:self.transfer('ERROR'));button(b2,'→ INBOX',lambda:self.transfer('INBOX'))
-        button(b2,'Mở PDF',self.open_pdf)
-        ttk.Label(right,text='Loại: HD, BBTL, DNTT, TTR, QD, CV, TB… • Không có số: KSO',wraplength=450).pack(fill='x')
-        self.tabs=ttk.Notebook(right);self.tabs.pack(fill='both',expand=True,pady=8)
-        box=ttk.Frame(self.tabs);pdfbox=ttk.Frame(self.tabs);self.tabs.add(box,text='Văn bản OCR');self.tabs.add(pdfbox,text='Xem PDF gốc')
-        self.text=tk.Text(box,wrap='word',font=('Segoe UI',10));self.text.pack(fill='both',expand=True)
-        pdfbar=ttk.Frame(pdfbox);pdfbar.pack(fill='x');self.page_label=tk.StringVar()
-        button(pdfbar,'◀',lambda:self.change_page(-1));button(pdfbar,'▶',lambda:self.change_page(1))
-        ttk.Label(pdfbar,textvariable=self.page_label).pack(side='left',padx=12)
-        self.canvas=tk.Canvas(pdfbox,bg='#e5e7eb',highlightthickness=0)
-        yscroll=ttk.Scrollbar(pdfbox,orient='vertical',command=self.canvas.yview);yscroll.pack(side='right',fill='y')
-        self.canvas.configure(yscrollcommand=yscroll.set);self.canvas.pack(fill='both',expand=True)
-        self.canvas.bind('<MouseWheel>',lambda e:self.canvas.yview_scroll(-int(e.delta/120),'units'))
-        self.tabs.bind('<<NotebookTabChanged>>',lambda e:self.render_pdf())
-        ttk.Label(self,textvariable=self.status,padding=10).pack(fill='x')
-        ttk.Label(self,text=COPYRIGHT,padding=(10,0,10,6),foreground='#6b7280').pack(fill='x')
-        self.scan();self.after(100,self.poll);self.after(WATCH_INTERVAL_MS,self.watch_tick)
+        self.confidence_var=tk.StringVar(value='—'); ttk.Label(form,text='Độ tin cậy',style='Card.TLabel').grid(row=4,column=0,sticky='w',pady=4)
+        ttk.Label(form,textvariable=self.confidence_var,style='Card.TLabel',font=('Segoe UI',10,'bold')).grid(row=4,column=1,sticky='w',padx=10)
+        self.new=tk.StringVar(); ttk.Label(form,textvariable=self.new,style='Card.TLabel',foreground=self.BLUE,wraplength=430).grid(row=5,column=0,columnspan=2,sticky='w',pady=(10,2))
+
+        actions=ttk.Frame(right,style='Card.TFrame'); actions.pack(fill='x',pady=10)
+        ttk.Button(actions,text='Lưu chỉnh sửa',command=self.save_current).pack(side='left')
+        ttk.Button(actions,text='Mở PDF',command=self.open_pdf).pack(side='left',padx=6)
+        ttk.Button(actions,text='Đánh dấu lỗi',command=lambda:self.transfer('ERROR')).pack(side='right')
+
+        self.tabs=ttk.Notebook(right); self.tabs.pack(fill='both',expand=True)
+        ocr=ttk.Frame(self.tabs,style='Card.TFrame'); self.tabs.add(ocr,text='Văn bản OCR')
+        self.text=tk.Text(ocr,wrap='word',font=('Segoe UI',10),relief='flat',bg='white'); self.text.pack(fill='both',expand=True,padx=4,pady=4)
+
+        foot=tk.Frame(self,bg='white',height=36); foot.pack(fill='x')
+        tk.Label(foot,textvariable=self.status,bg='white',fg=self.MUTED,font=('Segoe UI',9)).pack(side='left',padx=22,pady=8)
+        tk.Label(foot,text='v2.2 • Agent #01 • OCR Việt + Anh • Ngoại tuyến',bg='white',fg=self.MUTED,font=('Segoe UI',9)).pack(side='right',padx=22)
+
+    def _toggle_agent(self):
+        self.agent_label.configure(text='●  Tự động đang hoạt động' if self.watch_enabled.get() else '○  Tự động đang tắt',foreground=self.GREEN if self.watch_enabled.get() else self.MUTED)
+
+    def open_active_folder(self):
+        try: os.startfile(self.engine.root/STATES[self.active_state])
+        except Exception as exc: messagebox.showerror('Không mở được thư mục',str(exc),parent=self)
+
+    def add_files(self):
+        from tkinter import filedialog
+        files=filedialog.askopenfilenames(parent=self,title='Chọn hồ sơ PDF',filetypes=[('PDF','*.pdf')])
+        if not files:return
+        inbox=self.engine.root/STATES['INBOX']; added=0
+        for name in files:
+            src=Path(name)
+            try:
+                dst=unique_path(inbox/src.name); shutil.copy2(src,dst); added+=1
+            except Exception as exc:self.engine.log('IMPORT_ERROR',src,detail=str(exc))
+        self.status.set(f'Đã thêm {added} hồ sơ • Agent sẽ tự xử lý')
+        self.scan('INBOX')
+
+    def update_counts(self):
+        for k in STATES:
+            try:self.count_vars[k].set(str(len(self.engine.scan(k))))
+            except Exception:self.count_vars[k].set('—')
 
     def watch_tick(self):
         try:
+            self.update_counts()
             if self.watch_enabled.get() and not self.busy:
-                inbox=self.engine.scan('INBOX')
-                fresh=[]
-                for p in inbox:
+                now=time.time(); current=set()
+                for p in self.engine.scan('INBOX'):
                     try:
-                        sig=(p.stat().st_size,p.stat().st_mtime_ns)
-                        if self.seen.get(str(p))==sig: continue
-                        self.seen[str(p)]=sig; fresh.append(p)
-                    except OSError: pass
-                if fresh:
-                    self.set_busy(True)
-                    def run(paths=fresh):
+                        key=str(p); sig=(p.stat().st_size,p.stat().st_mtime_ns); current.add(key)
+                        old=self.pending.get(key)
+                        if old and old[0]==sig: self.pending[key]=(sig,old[1]+1)
+                        else:self.pending[key]=(sig,1)
+                    except OSError:pass
+                for key in list(self.pending):
+                    if key not in current:self.pending.pop(key,None)
+                ready=[Path(k) for k,(sig,n) in self.pending.items() if n>=2 and Path(k).exists()]
+                if ready:
+                    for p in ready:self.pending.pop(str(p),None)
+                    self.set_busy(True); self.status.set(f'Đang tự động xử lý {len(ready)} hồ sơ...')
+                    def run(paths=ready):
                         good=bad=0
                         try:
                             self.engine.check_runtime()
                             for p in paths:
-                                try: self.engine.auto_process(p,lambda s:self.events.put(('progress',s))); good+=1
+                                try:self.engine.auto_process(p,lambda s:self.events.put(('progress',s)));good+=1
                                 except Exception as exc:
                                     bad+=1; d=self.engine.load(p); d.update(status='Lỗi xử lý',error=str(exc),analyzed=False)
                                     self.engine.log('AGENT_ERROR',p,detail=str(exc))
                                     try:self.engine.move(p,'ERROR',d)
                                     except Exception:pass
-                            self.events.put(('done',f'Auto Agent: {good} xử lý, {bad} lỗi.'))
-                        except Exception as exc:self.events.put(('done',str(exc)))
+                            self.events.put(('done',f'Đã xử lý {good} hồ sơ' + (f' • {bad} lỗi' if bad else '')))
+                        except Exception as exc:self.events.put(('done','Lỗi: '+str(exc)))
                     threading.Thread(target=run,daemon=True).start()
-        finally:
-            self.after(WATCH_INTERVAL_MS,self.watch_tick)
+        finally:self.after(WATCH_INTERVAL_MS,self.watch_tick)
 
-    def values(self): return {k:v.get().strip() for k,v in self.vars.items()}
-    def preview(self):
-        if hasattr(self,'new'): self.new.set(proposed(self.values()))
+    def values(self):return {k:v.get().strip() for k,v in self.vars.items()}
+    def preview_name(self):
+        if hasattr(self,'new'):self.new.set(proposed(self.values()))
     def clear(self):
         self.current=None
         for v in self.vars.values():v.set('')
-        self.text.delete('1.0','end')
-        self.canvas.delete('all');self.page_label.set('');self.page_index=0
+        self.confidence_var.set('—'); self.text.delete('1.0','end'); self.preview_box.delete('all'); self.page_index=0
     def persist(self):
         if self.current and self.current.exists() and not self.busy:
-            d=self.engine.load(self.current);d.update(self.values());self.engine.save(self.current,d)
-    def scan(self):
+            d=self.engine.load(self.current); d.update(self.values()); self.engine.save(self.current,d)
+
+    def scan(self,state=None):
         if self.busy:return
-        self.persist();self.clear()
-        self.tree.delete(*self.tree.get_children());self.rows={}
-        for p in self.engine.scan(self.state.get()):
-            d=self.engine.load(p)
-            iid=self.tree.insert('','end',values=(p.name,proposed(d) if d.get('analyzed') or d.get('date') else '',d['status']))
+        if state:self.active_state=state
+        self.persist();self.clear();self.tree.delete(*self.tree.get_children());self.rows={};self.update_counts()
+        for p in self.engine.scan(self.active_state):
+            d=self.engine.load(p); conf=d.get('confidence','')
+            iid=self.tree.insert('','end',values=(p.name,proposed(d) if d.get('analyzed') or d.get('date') else '',d.get('type',''),d.get('date',''),(str(conf)+'%') if conf!='' else '—',d.get('status','')))
             self.rows[iid]=p
-        self.status.set(f'{len(self.rows)} PDF • {STATES[self.state.get()]} • Đặt PDF mới vào 01_INBOX rồi Quét thư mục')
+        labels={'INBOX':'Hồ sơ mới','REVIEW':'Cần kiểm tra','COMPLETED':'Đã xử lý','ERROR':'Lỗi xử lý'}
+        self.status.set(f'{labels[self.active_state]}: {len(self.rows)} hồ sơ • Agent tự động: ' + ('BẬT' if self.watch_enabled.get() else 'TẮT'))
+
     def pick(self,event=None):
         if self.busy:return
         sel=self.tree.selection()
@@ -502,91 +564,78 @@ class App(tk.Tk):
         if p==self.current:return
         self.persist();self.current=p;d=self.engine.load(p)
         for k,v in self.vars.items():v.set(d.get(k,''))
-        self.text.delete('1.0','end');self.text.insert('1.0',('LỖI OCR: '+d['error']+'\n\n' if d.get('error') else '')+d.get('text',''))
+        conf=d.get('confidence');self.confidence_var.set((str(conf)+'%') if conf is not None else '—')
+        self.text.delete('1.0','end');self.text.insert('1.0',('LỖI: '+d['error']+'\n\n' if d.get('error') else '')+d.get('text',''))
         self.page_index=0;self.render_pdf()
+
+    def render_pdf(self):
+        self.preview_box.delete('all')
+        if not self.current:return
+        try:
+            with fitz.open(stream=self.current.read_bytes(),filetype='pdf') as doc:
+                page=doc[0]; width=max(360,self.preview_box.winfo_width()-20)
+                scale=width/page.rect.width; pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale),colorspace=fitz.csRGB,alpha=False)
+                self.photo=ImageTk.PhotoImage(Image.frombytes('RGB',[pix.width,pix.height],pix.samples))
+                self.preview_box.create_image(10,8,anchor='nw',image=self.photo);self.preview_box.configure(scrollregion=(0,0,pix.width+20,pix.height+16))
+        except Exception as exc:self.preview_box.create_text(20,20,anchor='nw',text='Không xem trước được PDF\n'+str(exc),fill=self.RED)
+
     def save_current(self):
         if not self.current:return
-        self.persist();self.engine.log('METADATA',self.current);self.status.set('Đã lưu metadata.');self.refresh_row()
-    def refresh_row(self):
-        for iid,p in self.rows.items():
-            if p==self.current:
-                d=self.engine.load(p);self.tree.item(iid,values=(p.name,proposed(d),d['status']))
+        self.persist();self.engine.log('METADATA',self.current);self.status.set('Đã lưu chỉnh sửa.');self.scan(self.active_state)
+
     def set_busy(self,flag):
         self.busy=flag
-        for b in self.controls:b.configure(state='disabled' if flag else 'normal')
         for e in self.entries:e.configure(state='disabled' if flag else 'normal')
-        self.combo.configure(state='disabled' if flag else 'readonly')
+
     def reocr_current(self):
         if not self.current or self.busy:return
-        if not messagebox.askyesno('OCR lại hồ sơ',
-                'OCR lại sẽ đọc lại ảnh trang và thay thế toàn bộ Ngày, Số/ký hiệu, Loại hồ sơ, '
-                'Nội dung vắn tắt bằng đề xuất mới — kể cả phần bạn đã sửa tay trước đó.\n\n'
-                'Bạn có chắc chắn muốn tiếp tục?',parent=self):return
-        self.ocr_all(single=True,force=True)
-    def ocr_all(self,single=False,force=False):
-        if self.busy:return
-        self.persist()
-        paths=[self.current] if single and self.current else ([] if single else list(self.rows.values()))
-        if not paths:return
-        self.set_busy(True)
+        if not messagebox.askyesno('Xử lý lại OCR','Đọc lại hồ sơ và thay thế thông tin nhận diện hiện tại?',parent=self):return
+        self.ocr_all([self.current],force=True)
+
+    def ocr_all(self,paths,force=False):
+        if self.busy or not paths:return
+        self.persist();self.set_busy(True)
         def run():
             good=bad=0
             try:
                 self.engine.check_runtime()
                 for p in paths:
-                    try:
-                        self.engine.analyze(p,lambda s:self.events.put(('progress',s)),force=force);good+=1
+                    try:self.engine.analyze(p,lambda s:self.events.put(('progress',s)),force=force);good+=1
                     except Exception as exc:
-                        bad+=1;d=self.engine.load(p);d.update(status='Lỗi OCR',error=str(exc),analyzed=False)
-                        self.engine.log('OCR_ERROR',p,detail=str(exc))
-                        try:self.engine.move(p,'ERROR',d)
-                        except Exception as move_error:self.engine.log('MOVE_ERROR',p,detail=str(move_error))
-                self.events.put(('done',f'OCR xong: {good} thành công, {bad} lỗi. Hồ sơ lỗi ở 05_ERROR.'))
-            except Exception as exc:self.events.put(('done',str(exc)))
+                        bad+=1;d=self.engine.load(p);d.update(status='Lỗi OCR',error=str(exc),analyzed=False);self.engine.log('OCR_ERROR',p,detail=str(exc))
+                self.events.put(('done',f'OCR xong: {good} thành công, {bad} lỗi'))
+            except Exception as exc:self.events.put(('done','Lỗi: '+str(exc)))
         threading.Thread(target=run,daemon=True).start()
+
     def poll(self):
         try:
             while True:
-                kind,value=self.events.get_nowait()
-                if kind=='done':
-                    self.current=None;self.set_busy(False);self.scan()
-                self.status.set(value)
+                kind,value=self.events.get_nowait();self.status.set(value)
+                if kind=='done':self.current=None;self.set_busy(False);self.scan('REVIEW' if len(self.engine.scan('REVIEW')) else self.active_state)
         except queue.Empty:pass
         self.after(100,self.poll)
+
     def approve(self):
         if not self.current or self.busy:return
         try:
             d=self.engine.load(self.current);d.update(self.values());validate(d)
-            if not messagebox.askyesno('Duyệt hồ sơ',f'Chuyển vào 04_COMPLETED với tên:\n\n{proposed(d)}\n\nNếu trùng tên sẽ tự thêm _02, _03…',parent=self):return
-            dst=self.engine.approve(self.current,d);self.current=None;self.scan();self.status.set('Đã hoàn tất: '+dst.name)
-        except Exception as exc:messagebox.showerror('Không thể duyệt',str(exc),parent=self)
+            dst=self.engine.approve(self.current,d);self.current=None;self.scan('REVIEW');self.status.set('Đã hoàn tất: '+dst.name)
+        except Exception as exc:messagebox.showerror('Không thể hoàn tất',str(exc),parent=self)
+
     def transfer(self,state):
         if not self.current or self.busy:return
         try:
-            d=self.engine.load(self.current);d.update(self.values());self.engine.move(self.current,state,d)
-            self.current=None;self.scan();self.status.set('Đã chuyển sang '+state)
+            d=self.engine.load(self.current);d.update(self.values());self.engine.move(self.current,state,d);self.current=None;self.scan(state);self.status.set('Đã chuyển hồ sơ.')
         except Exception as exc:messagebox.showerror('Không thể chuyển',str(exc),parent=self)
+
     def open_pdf(self):
-        if self.current:self.tabs.select(1);self.render_pdf()
-    def change_page(self,delta):
-        self.page_index=max(0,self.page_index+delta);self.render_pdf()
-    def render_pdf(self):
-        if not self.current or self.tabs.index('current')!=1:return
-        self.canvas.delete('all')
-        try:
-            with fitz.open(stream=self.current.read_bytes(),filetype='pdf') as doc:
-                self.page_index=min(self.page_index,len(doc)-1)
-                page=doc[self.page_index]
-                width=max(420,self.canvas.winfo_width()-22)
-                pix=page.get_pixmap(matrix=fitz.Matrix(width/page.rect.width,width/page.rect.width),colorspace=fitz.csRGB,alpha=False)
-                self.photo=ImageTk.PhotoImage(Image.frombytes('RGB',[pix.width,pix.height],pix.samples))
-                self.canvas.delete('all');self.canvas.create_image(0,0,anchor='nw',image=self.photo)
-                self.canvas.configure(scrollregion=(0,0,pix.width,pix.height));self.canvas.yview_moveto(0)
-                self.page_label.set(f'Trang {self.page_index+1}/{len(doc)}')
-        except Exception as exc:self.page_label.set('Không mở được PDF: '+str(exc)[:65])
+        if self.current:
+            try:os.startfile(self.current)
+            except Exception as exc:messagebox.showerror('Không mở được PDF',str(exc),parent=self)
+
     def close(self):
         if self.busy:
-            messagebox.showinfo('OCR đang chạy','Vui lòng đợi OCR hoàn tất trước khi đóng ứng dụng.',parent=self);return
+            if not messagebox.askyesno('Đang xử lý','Hệ thống đang xử lý hồ sơ. Vẫn đóng ứng dụng?',parent=self):return
         self.persist();self.destroy()
 
 def self_test_core():
