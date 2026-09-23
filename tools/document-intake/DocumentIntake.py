@@ -7,7 +7,7 @@ from tkinter import ttk, messagebox
 import pymupdf as fitz
 from PIL import Image, ImageTk
 
-APP_VERSION = '2.2.0 Agent #01 (2026-09-23)'
+APP_VERSION = '2.3.0 Agent #01 (2026-09-23)'
 AUTO_THRESHOLD = 90
 WATCH_INTERVAL_MS = 2500
 COPYRIGHT = 'Bản quyền © 2026 Phan Văn Ngọc'
@@ -204,13 +204,15 @@ class Engine:
             ]
             self.tessdata = next((x for x in candidates if x and x.is_dir()), BUNDLE_DIR/'runtime'/'tessdata')
         os.environ['TESSDATA_PREFIX'] = str(self.tessdata)
-        os.environ['OMP_THREAD_LIMIT'] = '2'
+        os.environ['OMP_THREAD_LIMIT'] = '1'
+        self.runtime_checked=False
         try:
             self.user = getpass.getuser()
         except Exception:
             self.user = 'unknown'
 
     def check_runtime(self):
+        if self.runtime_checked: return 'eng vie'
         for p in [self.exe, self.tessdata/'vie.traineddata', self.tessdata/'eng.traineddata']:
             if not p.is_file():
                 raise RuntimeError('Thiếu thành phần đi kèm: '+str(p)+'. Hãy giải nén lại toàn bộ ZIP.')
@@ -219,6 +221,7 @@ class Engine:
                                 creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         if result.returncode or not {'eng','vie'}.issubset(set(result.stdout.split())):
             raise RuntimeError('OCR runtime không hoạt động: '+result.stderr)
+        self.runtime_checked=True
         return result.stdout
 
     def ocr_image(self,image,psm):
@@ -293,46 +296,46 @@ class Engine:
             w.writerow([dt.datetime.now().isoformat(timespec='seconds'), self.user, action, str(source), str(target), detail])
 
     def analyze(self, p, progress=None, force=False):
-        old = self.load(p)
-        if old.get('analyzed') and not force:
-            return old
-        out=[];header=''
-        # Opening from bytes ensures invalid PDFs cannot retain a Windows file lock.
-        with fitz.open(stream=p.read_bytes(), filetype='pdf') as doc:
-            if doc.needs_pass:
-                raise ValueError('PDF được mã hóa bằng mật khẩu.')
-            if not len(doc):
-                raise ValueError('PDF không có trang.')
-            for i, page in enumerate(doc):
-                if progress:
-                    progress(f'{p.name} • trang {i+1}/{len(doc)}')
-                text=page.get_text().strip()
-                if len(text)<120 or force:
-                    scale=min(2.5, 3500/max(page.rect.width, page.rect.height))
-                    pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale), colorspace=fitz.csRGB, alpha=False)
-                    image=Image.frombytes('RGB', [pix.width,pix.height], pix.samples)
-                    text=self.ocr_image(image,3)
-                    if i==0:
-                        pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale),clip=fitz.Rect(0,0,page.rect.width,page.rect.height*.4),colorspace=fitz.csRGB,alpha=False)
-                        image=Image.frombytes('RGB',[pix.width,pix.height],pix.samples)
-                        header=self.ocr_image(image,6)
+        old=self.load(p)
+        if old.get('analyzed') and not force:return old
+        out=[]; first_ocr=''
+        with fitz.open(stream=p.read_bytes(),filetype='pdf') as doc:
+            if doc.needs_pass:raise ValueError('PDF được mã hóa bằng mật khẩu.')
+            if not len(doc):raise ValueError('PDF không có trang.')
+            total=len(doc)
+            for i,page in enumerate(doc):
+                if progress:progress(f'{p.name} • đọc trang {i+1}/{total}')
+                native=page.get_text('text').strip()
+                # Fast path: PDF có text layer thì không OCR.
+                if len(native)>=80 and not force:
+                    text=native
+                else:
+                    # 1.65x đủ cho hồ sơ A4 phổ biến, nhanh hơn đáng kể so với 2.5x.
+                    scale=min(1.65,2200/max(page.rect.width,page.rect.height))
+                    pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale),colorspace=fitz.csGRAY,alpha=False)
+                    image=Image.frombytes('L',[pix.width,pix.height],pix.samples)
+                    text=self.ocr_image(image,6 if i==0 else 3)
+                    if i==0:first_ocr=text
                 out.append(text)
+                # Metadata cần chủ yếu ở trang đầu. Không OCR lại header lần hai.
+                if i==0:
+                    probe=metadata(text)
+                    if probe.get('date') and probe.get('number') and probe.get('summary') and not force:
+                        # Các trang sau có text layer vẫn lấy text; trang scan sau không OCR nếu không cần metadata.
+                        pass
         text='\n\n'.join(out)
-        if len(text.strip()) < 10:
-            raise ValueError('Không nhận diện được chữ trong PDF; cần kiểm tra chất lượng scan.')
+        if len(text.strip())<10:raise ValueError('Không nhận diện được chữ trong PDF; cần kiểm tra chất lượng scan.')
+        # Ưu tiên trang đầu, sau đó bổ sung từ 3 trang đầu nếu thiếu.
+        head='\n'.join(out[:3])
         d=metadata(out[0])
-        if header:
-            d['date']=extract_date(header) or d['date']
-            if not d['summary'] or d['type']=='PDX':
-                d['summary']=extract_summary(header,d['type']) or d['summary']
-            text+='\n\n--- OCR BỔ SUNG VÙNG ĐẦU TRANG ---\n'+header
+        if not d.get('date'):d['date']=extract_date(head)
+        if not d.get('number'):d['number']=extract_number(head)
+        if not d.get('summary'):d['summary']=extract_summary(head,d.get('type','HS'))
         score,reasons=confidence(d)
-        d.update(text=text, analyzed=True, pages=len(out), confidence=score, confidence_reasons=reasons, status='Cần duyệt')
-        missing=[label for key,label in [('date','ngày'),('number','số'),('summary','nội dung')] if not d[key]]
-        if missing:d['status']='Bổ sung '+', '.join(missing)
-        elif score>=AUTO_THRESHOLD:d['status']='Đủ điều kiện tự động'
-        self.save(p,d)
-        self.log('OCR',p,detail=f'{len(out)} trang')
+        missing=[label for key,label in [('date','ngày'),('number','số/ký hiệu'),('summary','nội dung')] if not d.get(key)]
+        status='Đủ điều kiện tự động' if score>=AUTO_THRESHOLD and not missing else ('Thiếu '+', '.join(missing) if missing else 'Cần kiểm tra')
+        d.update(text=text,analyzed=True,pages=len(out),confidence=score,confidence_reasons=reasons,status=status)
+        self.save(p,d);self.log('OCR',p,detail=f'{len(out)} trang; confidence={score}')
         return d
 
     def move(self, p, state, data=None, name=None):
@@ -385,7 +388,7 @@ class App(tk.Tk):
     BG='#f5f7fb'; CARD='#ffffff'; BLUE='#1769e0'; TEXT='#172033'; MUTED='#667085'; GREEN='#159455'; ORANGE='#d97706'; RED='#d92d20'
     def __init__(self,engine=None):
         super().__init__(); self.engine=engine or Engine()
-        self.title('Document Intake - Benthanh House'); self.geometry('1440x860'); self.minsize(1120,700); self.configure(bg=self.BG)
+        self.title('Document Intake - Benthanh House'); self.state('zoomed'); self.geometry('1360x820'); self.minsize(1050,650); self.configure(bg=self.BG)
         self.busy=False; self.current=None; self.rows={}; self.events=queue.Queue(); self.entries=[]; self.page_index=0
         self.watch_enabled=tk.BooleanVar(value=True); self.pending={}; self.active_state='REVIEW'
         self.protocol('WM_DELETE_WINDOW',self.close)
@@ -440,8 +443,9 @@ class App(tk.Tk):
         self.tree=ttk.Treeview(left,columns=('file','name','type','date','confidence','status'),show='headings',selectmode='browse')
         cols=[('file','Tên file hiện tại',185),('name','Tên đề xuất',330),('type','Loại',70),('date','Ngày',85),('confidence','Tin cậy',75),('status','Trạng thái',110)]
         for key,label,w in cols:self.tree.heading(key,text=label);self.tree.column(key,width=w,minwidth=55)
-        self.tree.pack(fill='both',expand=True); self.tree.bind('<<TreeviewSelect>>',self.pick)
-        y=ttk.Scrollbar(left,orient='vertical',command=self.tree.yview); self.tree.configure(yscrollcommand=y.set)
+        table=ttk.Frame(left,style='Card.TFrame');
+        self.tree.pack_forget(); self.tree.pack(in_=table,side='left',fill='both',expand=True); table.pack(fill='both',expand=True)
+        y=ttk.Scrollbar(table,orient='vertical',command=self.tree.yview); y.pack(side='right',fill='y'); self.tree.configure(yscrollcommand=y.set); self.tree.bind('<<TreeviewSelect>>',self.pick)
 
         bottom=ttk.Frame(left,style='Card.TFrame'); bottom.pack(fill='x',pady=(10,0))
         ttk.Button(bottom,text='Xử lý lại OCR',command=self.reocr_current).pack(side='left')
@@ -449,7 +453,7 @@ class App(tk.Tk):
         ttk.Button(bottom,text='Đưa về hồ sơ mới',command=lambda:self.transfer('INBOX')).pack(side='right',padx=6)
 
         ttk.Label(right,text='XEM TRƯỚC & THÔNG TIN',style='Card.TLabel',font=('Segoe UI',11,'bold')).pack(anchor='w')
-        self.preview_box=tk.Canvas(right,bg='#eef2f6',height=280,highlightthickness=0); self.preview_box.pack(fill='x',pady=(10,10))
+        self.preview_box=tk.Canvas(right,bg='#eef2f6',height=230,highlightthickness=0); self.preview_box.pack(fill='x',pady=(10,10))
         self.preview_box.bind('<MouseWheel>',lambda e:self.preview_box.yview_scroll(-int(e.delta/120),'units'))
 
         form=ttk.LabelFrame(right,text='Thông tin trích xuất',padding=10); form.pack(fill='x')
@@ -473,7 +477,7 @@ class App(tk.Tk):
 
         foot=tk.Frame(self,bg='white',height=36); foot.pack(fill='x')
         tk.Label(foot,textvariable=self.status,bg='white',fg=self.MUTED,font=('Segoe UI',9)).pack(side='left',padx=22,pady=8)
-        tk.Label(foot,text='v2.2 • Agent #01 • OCR Việt + Anh • Ngoại tuyến',bg='white',fg=self.MUTED,font=('Segoe UI',9)).pack(side='right',padx=22)
+        tk.Label(foot,text='v2.3 • Agent #01 • OCR nhanh • Ngoại tuyến',bg='white',fg=self.MUTED,font=('Segoe UI',9)).pack(side='right',padx=22)
 
     def _toggle_agent(self):
         self.agent_label.configure(text='●  Tự động đang hoạt động' if self.watch_enabled.get() else '○  Tự động đang tắt',foreground=self.GREEN if self.watch_enabled.get() else self.MUTED)
