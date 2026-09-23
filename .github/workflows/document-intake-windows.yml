@@ -1,0 +1,81 @@
+name: Document Intake Windows Build
+
+on:
+  push:
+    branches: [document-intake-agent01]
+    paths:
+      - 'tools/document-intake/**'
+      - '.github/workflows/document-intake-windows.yml'
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pymupdf pillow pyinstaller
+
+      - name: Install Tesseract OCR
+        run: |
+          choco install tesseract --yes --no-progress
+          $tess = "C:\Program Files\Tesseract-OCR"
+          if (!(Test-Path "$tess\tesseract.exe")) { throw "Tesseract not found" }
+          New-Item -ItemType Directory -Force -Path "tools\document-intake\runtime" | Out-Null
+          Copy-Item "$tess\*" "tools\document-intake\runtime" -Recurse -Force
+          Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata_fast/raw/main/vie.traineddata" -OutFile "tools\document-intake\runtime\tessdata\vie.traineddata"
+
+      - name: Source compile check
+        working-directory: tools/document-intake
+        run: python -m py_compile DocumentIntake.py
+
+      - name: Core test on Windows
+        working-directory: tools/document-intake
+        run: |
+          cmd /c "python DocumentIntake.py --self-test || exit /b 0"
+          if (Test-Path .\SELF_TEST_RESULT.json) { Get-Content .\SELF_TEST_RESULT.json }
+          $report = Get-Content .\SELF_TEST_RESULT.json -Raw | ConvertFrom-Json
+          if (-not $report.passed) { throw "Core self-test failed" }
+
+      - name: Build one-file EXE
+        working-directory: tools/document-intake
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed --name DocumentIntake --add-data "runtime;runtime" --hidden-import PIL._tkinter_finder DocumentIntake.py
+
+      - name: EXE self-test
+        working-directory: tools/document-intake
+        run: |
+          cmd /c ".\dist\DocumentIntake.exe --self-test || exit /b 0"
+          if (!(Test-Path .\SELF_TEST_RESULT.json)) { throw "EXE did not produce self-test report" }
+          Get-Content .\SELF_TEST_RESULT.json
+          $report = Get-Content .\SELF_TEST_RESULT.json -Raw | ConvertFrom-Json
+          if (-not $report.passed) { throw "EXE self-test failed" }
+
+      - name: Create checksum
+        working-directory: tools/document-intake
+        run: |
+          $h=(Get-FileHash .\dist\DocumentIntake.exe -Algorithm SHA256).Hash
+          "$h  DocumentIntake.exe" | Out-File -Encoding ascii .\dist\SHA256.txt
+          Get-Item .\dist\DocumentIntake.exe | Select-Object Name,Length
+          Get-Content .\dist\SHA256.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DocumentIntake-Agent01-Windows-x64
+          path: |
+            tools/document-intake/dist/DocumentIntake.exe
+            tools/document-intake/dist/SHA256.txt
+            tools/document-intake/SELF_TEST_RESULT.json
+          if-no-files-found: error
+          retention-days: 30
